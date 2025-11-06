@@ -4,10 +4,6 @@
 // cada vez que subas cambios al código de la app para forzar la actualización en los usuarios.
 const CACHE_NAME = 'apptodo-cache-v1.0';
 
-// 2. PREFIJO DE REPOSITORIO DE GITHUB PAGES (Necesario si usas subcarpeta)
-// Si tu app está en https://usuario.github.io/TodoApp/, este prefijo es necesario.
-const REPO_PREFIX = '/TodoApp/';
-
 // 3. ARCHIVOS PARA CACLEAR (Pre-cacheo): Lista de archivos esenciales
 // Las rutas usan el prefijo del repositorio para funcionar correctamente en GitHub Pages.
 const urlsToCache = [
