@@ -1,0 +1,526 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Perfil</title>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            // ✅ Registrar Service Worker
+            navigator.serviceWorker.register('/TodoApp/sw.js')
+                .then(() => console.log("✅ Service Worker registrado"))
+                .catch(err => console.error("❌ Error al registrar SW:", err));
+
+            // 📢 Escuchar si el SW avisa una nueva versión
+            navigator.serviceWorker.addEventListener("message", (event) => {
+                if (event.data && event.data.type === "NEW_VERSION") {
+                    console.log("🆕 Nueva versión disponible");
+
+                    // Mostrar mensaje visual antes de recargar
+                    const msg = document.createElement("div");
+                    msg.textContent = "🔄 Actualizando Apptodo...";
+                    msg.style.position = "fixed";
+                    msg.style.bottom = "20px";
+                    msg.style.left = "50%";
+                    msg.style.transform = "translateX(-50%)";
+                    msg.style.background = "#2ecc71";
+                    msg.style.color = "white";
+                    msg.style.padding = "12px 20px";
+                    msg.style.borderRadius = "10px";
+                    msg.style.fontWeight = "bold";
+                    msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+                    msg.style.zIndex = "9999";
+                    document.body.appendChild(msg);
+
+                    // Espera un poco y recarga la app
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            });
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f7f9fc;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding-bottom: 80px;
+            color: #2c3e50;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+            .profile-header h1 {
+                margin: 10px 0 5px;
+                font-size: 1.8rem;
+                color: #34495e;
+            }
+
+            .profile-header p {
+                color: #7f8c8d;
+                font-size: 0.95rem;
+            }
+
+        .profile-picture {
+            position: relative;
+            display: inline-block;
+        }
+
+            .profile-picture img {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 4px solid #3498db;
+            }
+
+        .change-photo-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .change-photo-btn:hover {
+                background-color: #2980b9;
+            }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .profile-field label {
+                font-weight: bold;
+                margin-bottom: 5px;
+                color: #2c3e50;
+            }
+
+            .profile-field input {
+                padding: 10px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+                font-size: 1rem;
+                color: #333;
+            }
+
+        .edit-profile-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #2ecc71;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .edit-profile-btn:hover {
+                background-color: #27ae60;
+            }
+
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+
+        /* --- BOTONES EXPORTAR / IMPORTAR --- */
+        .backup-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+            .backup-buttons button {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                border-radius: 8px;
+                font-weight: bold;
+                color: #fff;
+                cursor: pointer;
+                font-size: 0.95rem;
+                transition: 0.3s;
+            }
+
+        .export-btn {
+            background-color: #3498db;
+        }
+
+            .export-btn:hover {
+                background-color: #2980b9;
+            }
+
+        .import-btn {
+            background-color: #9b59b6;
+        }
+
+            .import-btn:hover {
+                background-color: #8e44ad;
+            }
+
+
+        /* --- BLOC DE NOTAS --- */
+        .notes-container {
+            margin-top: 35px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+            .notes-container h2 {
+                text-align: center;
+                margin-bottom: 10px;
+                color: #34495e;
+            }
+
+        textarea {
+            width: 100%;
+            height: 180px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            color: #333;
+            transition: border 0.3s;
+        }
+
+            textarea:focus {
+                border-color: #3498db;
+            }
+
+        .note-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+            .note-actions button {
+                flex: 1;
+                padding: 10px;
+                margin: 0 5px;
+                border: none;
+                border-radius: 8px;
+                color: #fff;
+                font-weight: bold;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+        .save-note {
+            background-color: #3498db;
+        }
+
+            .save-note:hover {
+                background-color: #2980b9;
+            }
+
+        .clear-note {
+            background-color: #e74c3c;
+        }
+
+            .clear-note:hover {
+                background-color: #c0392b;
+            }
+
+        .note-status {
+            text-align: center;
+            color: #27ae60;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+
+        /* ===============================
+        Bottom Bar
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+            .bottom-bar a {
+                color: #444;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 12px;
+                transition: 0.3s;
+            }
+
+            .bottom-bar img {
+                width: 28px;
+                height: 28px;
+                filter: brightness(0) invert(0);
+                transition: 0.3s;
+            }
+
+            .bottom-bar a.active img,
+            .bottom-bar a:hover img {
+                filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1);
+            }
+
+        @media (max-width: 768px) {
+            .bottom-bar {
+                padding: 8px 0;
+            }
+        }
+
+
+        /* CORRECCIÓN PARA CELULARES */
+        @media (max-width: 600px) {
+            .bottom-bar a {
+                font-size: 12px; /* Aumentar fuente ligeramente */
+            }
+
+            .bottom-bar img {
+                width: 28px; /* Mantener o aumentar el tamaño del icono */
+                height: 28px;
+            }
+
+
+            /* Asegurar que la barra tenga un padding adecuado en la parte inferior */
+            .bottom-bar {
+                padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+
+</head>
+<body>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-picture">
+                <img id="profileImage" src="images/perfil.png" alt="Foto de perfil">
+                <button class="change-photo-btn" id="changePhotoBtn">📷</button>
+            </div>
+            <h1 id="userNameDisplay">Tu Nombre</h1>
+            <p>Información personal</p>
+        </div>
+
+        <div class="profile-info">
+            <div class="profile-field">
+                <label for="userName">Nombre</label>
+                <input type="text" id="userName" placeholder="Escribe tu nombre" maxlength="40">
+            </div>
+
+            <div class="profile-field">
+                <label for="userEmail">Correo Electrónico</label>
+                <input type="email" id="userEmail" placeholder="correo@ejemplo.com">
+            </div>
+
+            <div class="profile-field">
+                <label for="userBio">Descripción</label>
+                <input type="text" id="userBio" placeholder="Algo sobre ti...">
+            </div>
+        </div>
+
+        <button class="edit-profile-btn" id="saveProfileBtn">Guardar Cambios</button>
+
+        <div class="backup-buttons">
+            <button class="export-btn" id="exportBtn">📤 Exportar Todo</button>
+            <button class="import-btn" id="importBtn">📥 Importar Todo</button>
+        </div>
+
+        <p id="statusMessage" class="status-message"></p>
+
+        <div class="notes-container">
+            <h2>🧠 Bloc rápido</h2>
+            <textarea id="quickNote" placeholder="Escribe tus ideas, pensamientos o recordatorios..."></textarea>
+            <div class="note-actions">
+                <button class="save-note" id="saveNote">💾 Guardar</button>
+                <button class="clear-note" id="clearNote">🗑️ Borrar</button>
+            </div>
+            <p id="noteStatus" class="note-status"></p>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg></a>
+        <a href="Calendario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></a>
+        <a href="Tareas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg></a>
+        <a href="Diario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg></a>
+        <a href="Finanzas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg></a>
+        <a href="Perfil.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userNameInput = document.getElementById('userName');
+            const userEmailInput = document.getElementById('userEmail');
+            const userBioInput = document.getElementById('userBio');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const profileImage = document.getElementById('profileImage');
+            const changePhotoBtn = document.getElementById('changePhotoBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const importBtn = document.getElementById('importBtn');
+            const noteTextarea = document.getElementById('quickNote');
+            const saveNoteBtn = document.getElementById('saveNote');
+            const clearNoteBtn = document.getElementById('clearNote');
+            const noteStatus = document.getElementById('noteStatus');
+
+            // 🧩 Cargar perfil
+            const savedProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+            if (savedProfile.name) userNameInput.value = savedProfile.name;
+            if (savedProfile.email) userEmailInput.value = savedProfile.email;
+            if (savedProfile.bio) userBioInput.value = savedProfile.bio;
+            if (savedProfile.image) profileImage.src = savedProfile.image;
+            if (savedProfile.name) userNameDisplay.textContent = savedProfile.name;
+
+            saveProfileBtn.addEventListener('click', () => {
+                const profileData = {
+                    name: userNameInput.value.trim(),
+                    email: userEmailInput.value.trim(),
+                    bio: userBioInput.value.trim(),
+                    image: profileImage.src
+                };
+                localStorage.setItem('userProfile', JSON.stringify(profileData));
+                localStorage.setItem('userName', profileData.name); // Actualizar nombre para la página de inicio
+                userNameDisplay.textContent = profileData.name || "Tu Nombre";
+                statusMessage.textContent = "Perfil actualizado ✅";
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
+            });
+
+            // 📸 Cambiar foto
+            changePhotoBtn.addEventListener('click', () => {
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = 'image/*';
+                fileInput.onchange = (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => { profileImage.src = reader.result; };
+                        reader.readAsDataURL(file);
+                    }
+                };
+                fileInput.click();
+            });
+
+            // 📤 Exportar todo (SIN WHATSAPP)
+            exportBtn.addEventListener('click', () => {
+                const allData = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    allData[key] = localStorage.getItem(key);
+                }
+                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Apptodo_backup.json";
+                a.click();
+                URL.revokeObjectURL(url);
+                statusMessage.textContent = "Datos exportados correctamente ✅";
+                setTimeout(() => { statusMessage.textContent = ""; }, 3000);
+            });
+
+            // 📥 Importar todo
+            importBtn.addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            for (const key in importedData) {
+                                localStorage.setItem(key, importedData[key]);
+                            }
+                            statusMessage.textContent = "Datos importados correctamente ✅";
+                            setTimeout(() => location.reload(), 2000);
+                        } catch {
+                            statusMessage.textContent = "Error al importar datos ❌";
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            });
+
+            // 🧠 Bloc rápido
+            const savedNote = localStorage.getItem('quickNote');
+            if (savedNote) noteTextarea.value = savedNote;
+
+            noteTextarea.addEventListener('input', () => {
+                localStorage.setItem('quickNote', noteTextarea.value);
+                noteStatus.textContent = "Guardado automáticamente...";
+                setTimeout(() => noteStatus.textContent = "", 1500);
+            });
+
+            saveNoteBtn.addEventListener('click', () => {
+                localStorage.setItem('quickNote', noteTextarea.value);
+                noteStatus.textContent = "Nota guardada ✅";
+                setTimeout(() => noteStatus.textContent = "", 2000);
+            });
+
+            clearNoteBtn.addEventListener('click', () => {
+                if (confirm("¿Deseas borrar tu nota?")) {
+                    noteTextarea.value = "";
+                    localStorage.removeItem('quickNote');
+                    noteStatus.textContent = "Nota eliminada 🗑️";
+                    setTimeout(() => noteStatus.textContent = "", 2000);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

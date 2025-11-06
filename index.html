@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#ffffff">
+    <script>
+        if ('serviceWorker' in navigator) {
+            // ✅ Registrar Service Worker
+            navigator.serviceWorker.register('/TodoApp/service-worker.js')
+                .then(() => console.log("✅ Service Worker registrado"))
+                .catch(err => console.error("❌ Error al registrar SW:", err));
+
+            // 📢 Escuchar si el SW avisa una nueva versión
+            navigator.serviceWorker.addEventListener("message", (event) => {
+                if (event.data && event.data.type === "NEW_VERSION") {
+                    console.log("🆕 Nueva versión disponible");
+
+                    // Mostrar mensaje visual antes de recargar
+                    const msg = document.createElement("div");
+                    msg.textContent = "🔄 Actualizando Apptodo...";
+                    msg.style.position = "fixed";
+                    msg.style.bottom = "20px";
+                    msg.style.left = "50%";
+                    msg.style.transform = "translateX(-50%)";
+                    msg.style.background = "#2ecc71";
+                    msg.style.color = "white";
+                    msg.style.padding = "12px 20px";
+                    msg.style.borderRadius = "10px";
+                    msg.style.fontWeight = "bold";
+                    msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+                    msg.style.zIndex = "9999";
+                    document.body.appendChild(msg);
+
+                    // Espera un poco y recarga la app
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            });
+        }
+    </script>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 20px;
+            padding-bottom: 80px; /* espacio para el bottom bar */
+            margin: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .main-greeting {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+
+        .tasks-summary-widget,
+        .events-widget,
+        .habits-widget { /* WIDGET */
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            border-left: 5px solid #3498db;
+        }
+
+        .widget-title {
+            color: #34495e;
+            margin-top: 0;
+            font-size: 1.3rem;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+
+
+
+        /* Habilitar clic en el título para abrir el modal */
+        .habits-widget .widget-title {
+            cursor: pointer;
+        }
+
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .summary-positive {
+            color: #27ae60;
+        }
+
+        .summary-negative {
+            color: #e74c3c;
+        }
+
+        .task-summary-list,
+        .event-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .task-summary-list li,
+            .event-list li {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px dotted #ecf0f1;
+                font-size: 0.95rem;
+            }
+
+                .task-summary-list li:first-child {
+                    font-weight: bold;
+                    color: #3498db;
+                    border-bottom: 2px solid #3498db;
+                    margin-bottom: 5px;
+                }
+
+        .task-summary-count, .event-date {
+            font-weight: bold;
+            color: #3498db;
+        }
+
+
+
+
+        /* === ESTILOS PARA HABIT TRACKER === */
+        #add-habit-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        #habits-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-around;
+        }
+
+        .habit-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 80px;
+            position: relative;
+        }
+
+        .habit-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ecf0f1; /* Gris claro (No completado) */
+            border: 2px solid #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            transition: background-color 0.3s, border-color 0.3s;
+            position: relative;
+            cursor: pointer;
+        }
+
+            .habit-circle.completed {
+                background-color: #2ecc71; /* Verde (Completado) */
+                border-color: #27ae60;
+            }
+
+        .habit-name {
+            font-size: 0.8rem;
+            color: #34495e;
+            line-height: 1.2;
+        }
+
+
+
+
+        /* === ESTILOS PARA EL MODAL DE GESTIÓN DE HÁBITOS === */
+        #habits-management-modal {
+            display: none; /* Ocultar por defecto */
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente */
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 5% desde arriba y centrado */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from         {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+
+            .modal-close-btn:hover,
+            .modal-close-btn:focus {
+                color: #34495e;
+                text-decoration: none;
+            }
+
+        .management-list {
+            list-style: none;
+            padding: 0;
+        }
+
+
+
+        /* Estilo para cada ítem de la lista en el modal */
+        .management-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 1.1rem;
+        }
+
+            .management-list-item:last-child {
+                border-bottom: none;
+            }
+
+            .management-list-item span:first-child {
+                flex-grow: 1;
+                padding-right: 10px;
+            }
+
+        .delete-habit-btn-modal {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+            .delete-habit-btn-modal:hover {
+                background: #c0392b;
+            }
+
+
+
+        /* === FIN ESTILOS MODAL === */
+
+        /* ===============================
+            Bottom Bar (NO MODIFICAR)
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* <- IMPORTANTE */
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+            .bottom-bar a {
+                color: #444;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 12px;
+                transition: 0.3s;
+            }
+
+                .bottom-bar a span.material-symbols-outlined {
+                    font-size: 28px; /* tamaño del icono */
+                    margin-bottom: 4px;
+                    transition: transform 0.2s, color 0.2s;
+                    color: #555; /* Color del icono por defecto (Gris Oscuro) */
+                }
+
+            .bottom-bar img {
+                width: 28px; /* ajusta el tamaño según tu diseño */
+                height: 28px;
+                filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
+                transition: 0.3s;
+            }
+
+            .bottom-bar a.active img,
+            .bottom-bar a:hover img {
+                filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
+            }
+
+            .bottom-bar a.active span.material-symbols-outlined {
+                transform: translateY(-3px) scale(1.1);
+                color: #3498db;
+            }
+
+            .bottom-bar a.active span {
+                color: #3498db;
+            }
+
+            .bottom-bar a:hover span.material-symbols-outlined {
+                transform: translateY(-2px);
+                color: #3498db;
+            }
+
+            .bottom-bar a:hover span {
+                color: #3498db;
+            }
+
+        @media (max-width: 768px) {
+            .bottom-bar {
+                padding: 8px 0;
+            }
+        }
+
+
+        /* CORRECCIÓN PARA CELULARES */
+        @media (max-width: 600px) {
+            .bottom-bar a {
+                font-size: 12px; /* Aumentar fuente ligeramente */
+            }
+
+            .bottom-bar img {
+                width: 28px; /* Mantener o aumentar el tamaño del icono */
+                height: 28px;
+            }
+
+
+            /* Asegurar que la barra tenga un padding adecuado en la parte inferior */
+            .bottom-bar {
+                padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="main-greeting">Hola<span id="greeting-name"></span></h1>
+        <p id="current-date" style="color: #444; margin-top: -10px;"></p>
+        <p id="motivational-quote" style="font-style: italic; color: #7f8c8d; margin-top: 15px;"></p>
+
+        <div class="habits-widget">
+            <h2 class="widget-title" id="open-habits-management">
+                Mis Hábitos Diarios 💪
+                <button id="add-habit-btn">+</button>
+            </h2>
+            <div id="habits-list">
+            </div>
+            <p id="no-habits-message" style="color: #7f8c8d; text-align: center; padding: 5px; display: none;">
+                ¡Añade tu primer hábito con el botón '+'! 🌟
+            </p>
+        </div>
+
+        <div class="tasks-summary-widget">
+            <h2 class="widget-title">Tareas Pendientes 🎯</h2>
+            <ul id="upcoming-tasks-list" class="task-summary-list"></ul>
+            <p id="no-tasks-message" style="display: none; color: #7f8c8d; text-align: center; padding: 5px;">
+                ¡Gran trabajo! Tareas completadas. ✅
+            </p>
+        </div>
+
+        <div class="events-widget">
+            <h2 class="widget-title">Próximos Eventos 🗓️</h2>
+            <ul id="upcoming-events-list" class="event-list">
+                <li id="events-loading">Cargando eventos...</li>
+            </ul>
+            <p id="no-events-message" style="display: none; color: #7f8c8d; text-align: center; padding: 10px;">
+                ¡Genial! No hay eventos próximos. 🎉
+            </p>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg></a>
+        <a href="Calendario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></a>
+        <a href="Tareas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg></a>
+        <a href="Diario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg></a>
+        <a href="Finanzas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg></a>
+        <a href="Perfil.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg></a>
+    </div>
+
+    <div id="habits-management-modal">
+        <div class="modal-content">
+            <span class="modal-close-btn" id="close-modal-btn">&times;</span>
+            <h2>Gestión de Hábitos</h2>
+            <ul class="management-list" id="management-habits-list">
+                <li style="text-align: center; color: #7f8c8d;">No hay hábitos para gestionar.</li>
+            </ul>
+            <p style="font-size: 0.9rem; color: #7f8c8d; margin-top: 15px;">
+                * Clic en el botón **`+`** en el inicio para añadir nuevos hábitos.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. Bienvenida ---
+            let userName = localStorage.getItem('userName');
+            const greetingElement = document.getElementById('greeting-name');
+
+            if (!userName) {
+                userName = prompt("¡Bienvenido! Por favor, ingresa tu nombre:");
+                if (userName && userName.trim() !== "") {
+                    localStorage.setItem('userName', userName.trim());
+                } else { userName = "Usuario"; }
+            }
+
+            if (greetingElement) {
+                greetingElement.textContent = " " + userName.trim() + "!";
+            }
+
+            // --- 2. Fecha ---
+            const dateElement = document.getElementById('current-date');
+            const today = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = today.toLocaleDateString('es-ES', options);
+            dateElement.textContent = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+            // --- 3. Frase motivacional (Actualización Diaria) ---
+            const quoteElement = document.getElementById('motivational-quote');
+            const quotes = [
+                "El único modo de hacer un gran trabajo es amar lo que haces. 🚀",
+                "El éxito no es la clave de la felicidad. La felicidad es la clave del éxito. ✨",
+                "Empieza donde estás. Usa lo que tienes. Haz lo que puedes. 💪",
+                "La mejor forma de predecir el futuro es creándolo. 💡",
+                "No dejes que el miedo de perder sea mayor que la emoción de ganar. 🥇",
+                "Un viaje de mil millas comienza con un solo paso. 👣",
+                "El fracaso es solo la oportunidad de comenzar de nuevo, pero con más inteligencia. 🧠",
+                "Cree en ti, incluso cuando nadie más lo haga. ✨",
+                "Con cada amanecer, tienes una nueva oportunidad para ser feliz. 🌅",
+                "Cada nuevo día es una nueva oportunidad para cambiar tu vida. 🗓️"
+            ];
+
+            // Obtener la fecha de hoy en formato YYYY-MM-DD
+            const todayDateKey = today.toISOString().slice(0, 10);
+            const storedQuote = localStorage.getItem('dailyQuote');
+            const storedDate = localStorage.getItem('dailyQuoteDate');
+            let finalQuote = "";
+
+            if (storedDate === todayDateKey && storedQuote) {
+                // Si la fecha guardada es HOY, usa la frase guardada
+                finalQuote = storedQuote;
+            } else {
+                // Si la fecha es diferente (es un nuevo día) o no hay frase guardada, elige una nueva
+                const newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                finalQuote = newQuote;
+
+                // Guardar la nueva frase y la fecha de hoy
+                localStorage.setItem('dailyQuote', newQuote);
+                localStorage.setItem('dailyQuoteDate', todayDateKey);
+            }
+
+            quoteElement.textContent = `"${finalQuote}"`;
+
+            // --- 4. HÁBITOS FUNCIONES ---
+            // Función auxiliar para detectar si un carácter es un emoji (usando el flag 'u' para caracteres Unicode)
+            const isEmoji = (str) => /\p{Emoji}/u.test(str);
+
+            // Obtener la lista de hábitos que el usuario quiere trackear
+            function getHabitsList() {
+                // *** CLAVE DE LISTA MAESTRA: 'userHabits' ***
+                const storedHabits = JSON.parse(localStorage.getItem('userHabits'));
+                return storedHabits || []; // Retorna un array vacío si no hay nada guardado
+            }
+
+            // Guardar la lista maestra de hábitos
+            function saveHabitsList(habits) {
+                localStorage.setItem('userHabits', JSON.stringify(habits));
+            }
+
+            // Función para obtener la clave de almacenamiento del estado diario
+            function getDailyHabitKey() {
+                const todayString = today.toISOString().slice(0, 10); // YYYY-MM-DD
+                return `habits_state_${todayString}`;
+            }
+
+            // Cargar el estado de los hábitos para hoy
+            function loadDailyHabitState() {
+                // *** CLAVE DE ESTADO DIARIO: 'habits_state_YYYY-MM-DD' ***
+                return JSON.parse(localStorage.getItem(getDailyHabitKey())) || {};
+            }
+
+            // Guardar el estado diario de los hábitos
+            function saveDailyHabitState(state) {
+                localStorage.setItem(getDailyHabitKey(), JSON.stringify(state));
+            }
+
+            // Añadir un nuevo hábito (ACTUALIZADA)
+            function addHabit() {
+                const habitEmoji = prompt("1/2: Ingresa el EMOJI (ej: 🧘) para el nuevo hábito:");
+                if (!habitEmoji || habitEmoji.trim() === "") return;
+
+                const habitName = prompt("2/2: Ingresa el NOMBRE del hábito (ej: Meditar 10 min):");
+                if (!habitName || habitName.trim() === "") return;
+
+                const finalEmoji = Array.from(habitEmoji.trim())[0] || '?';
+
+                const habitsList = getHabitsList();
+                const newId = Date.now().toString();
+
+                // Guarda el emoji y el nombre por separado
+                habitsList.push({ id: newId, emoji: finalEmoji, name: habitName.trim() });
+                saveHabitsList(habitsList);
+                renderHabits(); // Volver a dibujar la lista
+            }
+
+            // Función para eliminar un hábito
+            function deleteHabit(habitId) {
+                const habitList = getHabitsList();
+                const habitToDelete = habitList.find(h => h.id === habitId);
+
+                if (!confirm(`¿Estás seguro de que quieres eliminar el hábito: "${habitToDelete.name}"? Esta acción es irreversible.`)) {
+                    return;
+                }
+
+                // 1. Eliminar de la lista maestra
+                let habitsList = habitList.filter(h => h.id !== habitId);
+                saveHabitsList(habitsList);
+
+                // 2. Limpiar el estado de completado para el día actual
+                const currentDailyState = loadDailyHabitState();
+                if (currentDailyState.hasOwnProperty(habitId)) {
+                    delete currentDailyState[habitId];
+                    saveDailyHabitState(currentDailyState);
+                }
+
+                // 3. Actualizar la interfaz
+                renderHabits();
+                renderManagementList(); // Actualiza la lista en el modal
+            }
+
+
+            // Renderizar la lista de hábitos para el DASHBOARD (ACTUALIZADA)
+            function renderHabits() {
+                const habitsListElement = document.getElementById('habits-list');
+                const noHabitsMessage = document.getElementById('no-habits-message');
+                const habitsList = getHabitsList();
+                const habitState = loadDailyHabitState();
+
+                habitsListElement.innerHTML = ''; // Limpiar lista
+
+                if (habitsList.length === 0) {
+                    noHabitsMessage.style.display = 'block';
+                } else {
+                    noHabitsMessage.style.display = 'none';
+                    habitsList.forEach(habit => {
+                        const isCompleted = habitState[habit.id] || false;
+
+                        // Usamos la propiedad 'emoji' separada
+                        const emojiToShow = habit.emoji || '?';
+                        const nameToShow = habit.name || 'Sin Nombre';
+
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'habit-item';
+                        itemDiv.dataset.habitId = habit.id;
+
+                        const circleDiv = document.createElement('div');
+                        circleDiv.className = `habit-circle ${isCompleted ? 'completed' : ''}`;
+                        circleDiv.id = `habit-circle-${habit.id}`;
+                        circleDiv.addEventListener('click', () => toggleHabit(habit.id));
+
+                        // Insertar el emoji o el check de completado
+                        if (!isCompleted) {
+                            circleDiv.textContent = emojiToShow;
+                            circleDiv.style.fontSize = isEmoji(emojiToShow) ? '25px' : '1.5rem';
+                            circleDiv.style.color = '#34495e';
+                        } else {
+                            circleDiv.textContent = '✔';
+                            circleDiv.style.fontSize = '20px';
+                            circleDiv.style.color = 'white';
+                        }
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'habit-name';
+                        nameSpan.textContent = nameToShow;
+
+                        itemDiv.appendChild(circleDiv);
+                        itemDiv.appendChild(nameSpan);
+                        habitsListElement.appendChild(itemDiv);
+                    });
+                }
+            }
+
+            // RENDERIZA LA LISTA DENTRO DEL MODAL (ACTUALIZADA)
+            function renderManagementList() {
+                const managementList = document.getElementById('management-habits-list');
+                const habitsList = getHabitsList();
+                managementList.innerHTML = '';
+
+                if (habitsList.length === 0) {
+                    managementList.innerHTML = '<li style="text-align: center; color: #7f8c8d;">No hay hábitos para gestionar.</li>';
+                    return;
+                }
+
+                habitsList.forEach(habit => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'management-list-item';
+
+                    const nameSpan = document.createElement('span');
+                    // Muestra el emoji y el nombre juntos en la lista de gestión
+                    nameSpan.textContent = (habit.emoji || '?') + ' ' + (habit.name || 'Sin Nombre');
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-habit-btn-modal';
+                    deleteBtn.textContent = 'Eliminar';
+                    deleteBtn.addEventListener('click', () => deleteHabit(habit.id));
+
+                    listItem.appendChild(nameSpan);
+                    listItem.appendChild(deleteBtn);
+                    managementList.appendChild(listItem);
+                });
+            }
+
+            // NUEVA FUNCIÓN: Abrir Modal
+            function openHabitsManagement() {
+                renderManagementList();
+                document.getElementById('habits-management-modal').style.display = 'block';
+            }
+
+            // NUEVA FUNCIÓN: Cerrar Modal
+            function closeHabitsManagement() {
+                document.getElementById('habits-management-modal').style.display = 'none';
+                renderHabits(); // Asegura que el dashboard se actualice
+            }
+
+
+            // Cambiar el estado de un hábito y actualizar la interfaz (ACTUALIZADA)
+            function toggleHabit(habitId) {
+                const habitState = loadDailyHabitState();
+                const habitList = getHabitsList();
+                const habitData = habitList.find(h => h.id === habitId);
+
+                if (!habitData) return;
+
+                // Toggle del estado
+                habitState[habitId] = !habitState[habitId];
+
+                saveDailyHabitState(habitState);
+
+                // Actualizar visualmente SÓLO el círculo afectado
+                const circle = document.getElementById(`habit-circle-${habitId}`);
+
+                if (circle) {
+                    if (habitState[habitId]) {
+                        // Estado: Completado (Mostrar Check)
+                        circle.classList.add('completed');
+                        circle.textContent = '✔'; // Check
+                        circle.style.fontSize = '20px';
+                        circle.style.color = 'white';
+                    } else {
+                        // Estado: Pendiente (Mostrar Emoji guardado)
+                        circle.classList.remove('completed');
+
+                        const emojiToShow = habitData.emoji || '?';
+                        circle.textContent = emojiToShow;
+                        circle.style.fontSize = isEmoji(emojiToShow) ? '25px' : '1.5rem';
+                        circle.style.color = '#34495e';
+                    }
+                }
+            }
+
+            // Adjuntar eventos
+            document.getElementById('add-habit-btn').addEventListener('click', addHabit);
+            document.getElementById('open-habits-management').addEventListener('click', openHabitsManagement);
+            document.getElementById('close-modal-btn').addEventListener('click', closeHabitsManagement);
+
+
+            // --- 5. Tareas (Sin cambios) ---
+            function loadUpcomingTasks() {
+                const tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || [];
+                const pendingListElement = document.getElementById('upcoming-tasks-list');
+                const noTasksMessage = document.getElementById('no-tasks-message');
+
+                const pendingTasks = tasks.filter(t => !t.completed).slice(0, 5);
+                pendingListElement.innerHTML = '';
+
+                if (pendingTasks.length > 0) {
+                    noTasksMessage.style.display = 'none';
+                    const totalPending = tasks.filter(t => !t.completed).length;
+                    const summaryLi = document.createElement('li');
+                    summaryLi.innerHTML = `<span>Total Pendiente:</span><span class="task-summary-count">${totalPending}</span>`;
+                    pendingListElement.appendChild(summaryLi);
+
+                    pendingTasks.forEach(task => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<span>${task.text}</span>`;
+                        pendingListElement.appendChild(li);
+                    });
+                } else { noTasksMessage.style.display = 'block'; }
+            }
+
+            // --- 6. Eventos (Sin cambios) ---
+            function loadUpcomingEvents() {
+                const eventsData = JSON.parse(localStorage.getItem('calendarEvents')) || {};
+                const eventListElement = document.getElementById('upcoming-events-list');
+                const noEventsMessage = document.getElementById('no-events-message');
+                const loading = document.getElementById('events-loading');
+                if (loading) loading.remove();
+
+                const upcomingEvents = [];
+                const now = new Date(); now.setHours(0, 0, 0, 0);
+
+                for (const dateKey in eventsData) {
+                    if (eventsData.hasOwnProperty(dateKey)) {
+                        const parts = dateKey.split('-');
+                        const eventDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                        eventDate.setHours(0, 0, 0, 0);
+                        if (eventDate.getTime() >= now.getTime()) {
+                            eventsData[dateKey].forEach(e => upcomingEvents.push({ date: eventDate, name: e }));
+                        }
+                    }
+                }
+
+                upcomingEvents.sort((a, b) => a.date - b.date);
+                eventListElement.innerHTML = '';
+
+                if (upcomingEvents.length > 0) {
+                    noEventsMessage.style.display = 'none';
+                    upcomingEvents.slice(0, 5).forEach(event => {
+                        const li = document.createElement('li');
+                        const displayDate = event.date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }).toUpperCase();
+                        li.innerHTML = `<span>${event.name}</span><span class="event-date">${displayDate}</span>`;
+                        eventListElement.appendChild(li);
+                    });
+                } else { noEventsMessage.style.display = 'block'; }
+            }
+
+            renderHabits(); // Cargar y mostrar los hábitos al inicio
+            loadUpcomingEvents();
+            loadUpcomingTasks();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Lista de Tareas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <script>
+        if ('serviceWorker' in navigator) {
+            // ✅ Registrar Service Worker
+            navigator.serviceWorker.register('/TodoApp/sw.js')
+                .then(() => console.log("✅ Service Worker registrado"))
+                .catch(err => console.error("❌ Error al registrar SW:", err));
+
+            // 📢 Escuchar si el SW avisa una nueva versión
+            navigator.serviceWorker.addEventListener("message", (event) => {
+                if (event.data && event.data.type === "NEW_VERSION") {
+                    console.log("🆕 Nueva versión disponible");
+
+                    // Mostrar mensaje visual antes de recargar
+                    const msg = document.createElement("div");
+                    msg.textContent = "🔄 Actualizando Apptodo...";
+                    msg.style.position = "fixed";
+                    msg.style.bottom = "20px";
+                    msg.style.left = "50%";
+                    msg.style.transform = "translateX(-50%)";
+                    msg.style.background = "#2ecc71";
+                    msg.style.color = "white";
+                    msg.style.padding = "12px 20px";
+                    msg.style.borderRadius = "10px";
+                    msg.style.fontWeight = "bold";
+                    msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+                    msg.style.zIndex = "9999";
+                    document.body.appendChild(msg);
+
+                    // Espera un poco y recarga la app
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            });
+        }
+    </script>
+
+
+    <style>
+
+        /* -----------------------------
+            Estilos generales y fuente
+        ----------------------------- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(180deg, #f0f4f8 0%, #ffffff 100%);
+            margin: 0;
+            padding-bottom: 80px; /* espacio para bottom bar */
+            color: #2c3e50;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3436;
+            font-size: 2rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: 0.3s ease;
+        }
+
+            .container:hover {
+                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            }
+
+
+        /* -----------------------------
+            Input de nuevas tareas
+        ----------------------------- */
+        .task-input-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 25px auto 30px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        #new-task-input {
+            flex-grow: 1;
+            padding: 12px 14px;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+            #new-task-input:focus {
+                border-color: #3498db;
+                outline: none;
+                box-shadow: 0 0 6px rgba(52,152,219,0.3);
+            }
+
+        .add-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 0.3px;
+            transition: all 0.3s;
+        }
+
+            .add-btn:hover {
+                background-color: #2980b9;
+                transform: scale(1.05);
+            }
+
+
+        /* -----------------------------
+            Sección Única de Tareas
+        ----------------------------- */
+        .task-section {
+            background: #fdfdfd;
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            padding: 15px 20px; /* Reducción de padding para más minimalismo */
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+        }
+
+
+        /* Título de sección ELIMINADO según solicitud */
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .task-list li {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 12px 0px; /* Reducción de padding horizontal */
+                border-bottom: 1px solid #f0f0f0;
+                transition: background-color 0.2s, opacity 0.3s;
+            }
+
+                .task-list li:last-child {
+                    border-bottom: none;
+                }
+
+                .task-list li:hover {
+                    background-color: transparent;
+                }
+
+        .task-text {
+            flex-grow: 1;
+            margin-left: 10px;
+            font-size: 1rem;
+            color: #34495e;
+            transition: all 0.3s;
+        }
+
+
+        /* Estilo para tarea completada (TACHAR Y ENGRISAR) */
+        li.completed .task-text {
+            text-decoration: line-through;
+            color: #95a5a6;
+        }
+
+
+        /* Checkbox */
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #2ecc71;
+        }
+
+
+        /* Botón eliminar */
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.1rem; /* Icono más pequeño */
+            transition: all 0.2s;
+            opacity: 0.5; /* Más sutil */
+            padding: 5px;
+        }
+
+            .delete-btn:hover {
+                color: #c0392b;
+                opacity: 1;
+                transform: scale(1.1);
+            }
+
+
+        /* -----------------------------
+            Bottom Bar (CORREGIDO PARA MÓVIL)
+        ----------------------------- */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* <- IMPORTANTE */
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+            .bottom-bar a {
+                color: #444;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 12px;
+                transition: 0.3s;
+            }
+
+            .bottom-bar img {
+                width: 28px;
+                height: 28px;
+                filter: brightness(0) invert(0);
+                transition: 0.3s;
+            }
+
+            .bottom-bar a.active img,
+            .bottom-bar a:hover img {
+                filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1);
+            }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
+
+            .task-section {
+                padding: 15px;
+            }
+        }
+
+
+        /* CORRECCIÓN PARA CELULARES */
+        @media (max-width: 600px) {
+            .bottom-bar a {
+                font-size: 12px; /* Aumentar fuente ligeramente */
+            }
+
+            .bottom-bar img {
+                width: 28px; /* Mantener o aumentar el tamaño del icono */
+                height: 28px;
+            }
+
+
+            /* Asegurar que la barra tenga un padding adecuado en la parte inferior */
+            .bottom-bar {
+                padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>☑️ Mi Lista</h1>
+
+        <div class="task-input-container">
+            <input type="text" id="new-task-input" placeholder="Añadir tarea..." aria-label="Añadir nueva tarea">
+            <button id="add-task-btn" class="add-btn">Añadir</button>
+        </div>
+
+        <div class="task-section">
+            <ul id="task-list" class="task-list"></ul>
+            <p id="empty-message" class="empty-message" style="display: none;">¡Parece que tienes tiempo libre! ✨</p>
+        </div>
+
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg></a>
+        <a href="Calendario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></a>
+        <a href="Tareas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg></a>
+        <a href="Diario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg></a>
+        <a href="Finanzas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg></a>
+        <a href="Perfil.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('new-task-input');
+            const addButton = document.getElementById('add-task-btn');
+            const taskList = document.getElementById('task-list');
+            const emptyMessage = document.getElementById('empty-message');
+
+            // Usamos un nombre de almacenamiento distinto para evitar conflictos
+            let tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || [];
+            let nextTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+
+            function saveTasks() {
+                localStorage.setItem('minimalToggleTodoTasks', JSON.stringify(tasks));
+            }
+
+            function renderTasks() {
+                taskList.innerHTML = '';
+
+                // Ordenar: Pendientes (false) primero, Completadas (true) al final
+                tasks.sort((a, b) => a.completed - b.completed);
+
+                tasks.forEach(task => {
+                    const li = document.createElement('li');
+                    li.className = task.completed ? 'completed' : 'pending';
+                    li.dataset.id = task.id;
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = task.completed;
+                    checkbox.addEventListener('change', () => toggleTask(task.id));
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = 'task-text';
+                    textSpan.textContent = task.text;
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'delete-btn';
+                    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                    deleteButton.title = 'Eliminar tarea';
+                    deleteButton.addEventListener('click', () => deleteTask(task.id));
+
+                    li.appendChild(checkbox);
+                    li.appendChild(textSpan);
+                    li.appendChild(deleteButton);
+                    taskList.appendChild(li);
+                });
+
+                emptyMessage.style.display = tasks.length === 0 ? 'block' : 'none';
+                saveTasks();
+            }
+
+            function addTask(text) {
+                const trimmedText = text.trim();
+                if (trimmedText === "") return;
+
+                const newTask = {
+                    id: nextTaskId++,
+                    text: trimmedText,
+                    completed: false
+                };
+
+                // Añadimos la nueva tarea y re-renderizamos para que se ordene correctamente (arriba)
+                tasks.push(newTask);
+                input.value = '';
+                renderTasks();
+            }
+
+            function toggleTask(id) {
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    task.completed = !task.completed;
+                    renderTasks(); // Re-renderiza para que la tarea se mueva al final o suba
+                }
+            }
+
+            function deleteTask(id) {
+                tasks = tasks.filter(t => t.id !== id);
+                renderTasks();
+            }
+
+            // --- Event Listeners ---
+            addButton.addEventListener('click', () => addTask(input.value));
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask(input.value);
+            });
+
+            // --- Inicialización ---
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
