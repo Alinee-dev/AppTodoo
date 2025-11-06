@@ -1,0 +1,759 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Diario Personal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            // ✅ Registrar Service Worker
+            navigator.serviceWorker.register('/TodoApp/sw.js')
+                .then(() => console.log("✅ Service Worker registrado"))
+                .catch(err => console.error("❌ Error al registrar SW:", err));
+
+            // 📢 Escuchar si el SW avisa una nueva versión
+            navigator.serviceWorker.addEventListener("message", (event) => {
+                if (event.data && event.data.type === "NEW_VERSION") {
+                    console.log("🆕 Nueva versión disponible");
+
+                    // Mostrar mensaje visual antes de recargar
+                    const msg = document.createElement("div");
+                    msg.textContent = "🔄 Actualizando Apptodo...";
+                    msg.style.position = "fixed";
+                    msg.style.bottom = "20px";
+                    msg.style.left = "50%";
+                    msg.style.transform = "translateX(-50%)";
+                    msg.style.background = "#2ecc71";
+                    msg.style.color = "white";
+                    msg.style.padding = "12px 20px";
+                    msg.style.borderRadius = "10px";
+                    msg.style.fontWeight = "bold";
+                    msg.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+                    msg.style.zIndex = "9999";
+                    document.body.appendChild(msg);
+
+                    // Espera un poco y recarga la app
+                    setTimeout(() => window.location.reload(), 1500);
+                }
+            });
+        }
+    </script>
+
+    <style>
+
+        /* ----------------------------------- */
+
+        /* --- VARIABLES DE COLOR (Claro) --- */
+
+        /* ----------------------------------- */
+        :root {
+            --fondo-general: #f4f7f6;
+            --texto-principal: #2c3e50;
+            --tarjeta-fondo: #ffffff;
+            --borde-suave: #e0e6ec;
+            --color-primario: #3498db;
+            --color-exito: #2ecc71;
+            --color-alerta: #e74c3c;
+            --color-clave: #f39c12;
+            --sombra-suave: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* ----------------------------------- */
+
+        /* --- Estilos Base y Contenedor (MEJORADOS) --- */
+
+        /* ----------------------------------- */
+        body {
+            font-family: 'Poppins', sans-serif; /* Fuente moderna */
+            background-color: var(--fondo-general);
+            color: var(--texto-principal);
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 70px; /* Espacio para la barra inferior fija */
+            transition: background 0.3s;
+        }
+
+        .journal-container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: var(--tarjeta-fondo);
+            border-radius: 12px; /* Más redondeado */
+            box-shadow: var(--sombra-suave); /* Sombra suave y profesional */
+            position: relative;
+            min-height: 70vh;
+        }
+
+            .journal-container h1 {
+                text-align: center;
+                margin-bottom: 5px;
+                color: var(--color-primario);
+                font-weight: 700;
+            }
+
+        .subtitle {
+            text-align: center;
+            color: var(--texto-principal);
+            opacity: 0.7;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 0.95rem;
+        }
+
+
+        /* PANTALLA DE BLOQUEO (MEJORADA) */
+        .lock-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.98);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .lock-content {
+            padding: 40px 30px;
+            background-color: var(--fondo-general);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 350px;
+        }
+
+        #lock-title {
+            color: var(--color-primario);
+            margin-top: 0;
+        }
+
+        #private-key {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--borde-suave);
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+            #private-key:focus {
+                border-color: var(--color-primario);
+                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            }
+
+        .unlock-btn {
+            padding: 10px 20px;
+            background-color: var(--color-primario);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+            .unlock-btn:hover {
+                background-color: #2980b9;
+                transform: translateY(-1px);
+            }
+
+
+        /* Controles de Fecha (MEJORADOS) */
+        .date-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background-color: var(--fondo-general);
+            border: 1px solid var(--borde-suave);
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        #journal-date {
+            flex-grow: 1;
+            margin: 0 10px;
+            text-align: center;
+            font-weight: 600;
+            border: none;
+            padding: 8px;
+            background: none;
+            color: var(--texto-principal);
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+
+        /* Botones de Navegación */
+        .date-controls .nav-btn {
+            background: none;
+            border: none;
+            color: var(--color-primario);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s, background-color 0.2s;
+            border-radius: 6px;
+        }
+
+            .date-controls .nav-btn:hover {
+                background-color: rgba(52, 152, 219, 0.1);
+                color: #2980b9;
+            }
+
+
+        /* Área de Texto (MEJORADA) */
+        #journal-entry {
+            width: 100%;
+            min-height: 400px;
+            padding: 20px;
+            border: 1px solid var(--borde-suave);
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+            #journal-entry:focus {
+                border-color: var(--color-primario);
+                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+                outline: none;
+            }
+
+
+        /* Botón de Guardar (MEJORADO) */
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--color-exito);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+            transition: background-color 0.3s, opacity 0.3s, box-shadow 0.3s;
+        }
+
+            .save-btn:hover:not(:disabled) {
+                background-color: #27ae60;
+                box-shadow: 0 6px 8px rgba(46, 204, 113, 0.4);
+            }
+
+            .save-btn:disabled {
+                background-color: #bdc3c7;
+                cursor: not-allowed;
+                opacity: 0.8;
+                box-shadow: none;
+            }
+
+
+        /* Botón de Cambio de Clave (MEJORADO) */
+        .change-key-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background-color: var(--color-clave);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .change-key-btn:hover {
+                background-color: #e67e22;
+            }
+
+
+        /* Mensajes de Estado (MEJORADOS) */
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+            .status-message.success {
+                color: var(--color-exito);
+                font-weight: 600;
+            }
+
+            .status-message.error {
+                color: var(--color-alerta);
+                font-weight: 600;
+            }
+
+
+        /* ===============================
+        Bottom Bar (DISEÑO ORIGINAL DEL USUARIO)
+        ============================== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom)); /* <- IMPORTANTE */
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+            border-top: 1px solid #ddd;
+            z-index: 9999;
+        }
+
+            .bottom-bar a {
+                color: #444;
+                text-decoration: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 12px;
+                transition: 0.3s;
+            }
+
+                .bottom-bar a span.material-symbols-outlined {
+                    font-size: 28px; /* tamaño del icono */
+                    margin-bottom: 4px;
+                    transition: transform 0.2s, color 0.2s;
+                    color: #555; /* Color del icono por defecto (Gris Oscuro) */
+                }
+
+            .bottom-bar img {
+                width: 28px; /* ajusta el tamaño según tu diseño */
+                height: 28px;
+                filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
+                transition: 0.3s;
+            }
+
+            .bottom-bar a.active img,
+            .bottom-bar a:hover img {
+                filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
+            }
+
+            .bottom-bar a.active span.material-symbols-outlined {
+                transform: translateY(-3px) scale(1.1);
+                color: #3498db;
+            }
+
+            .bottom-bar a.active span {
+                color: #3498db;
+            }
+
+            .bottom-bar a:hover span.material-symbols-outlined {
+                transform: translateY(-2px);
+                color: #3498db;
+            }
+
+            .bottom-bar a:hover span {
+                color: #3498db;
+            }
+
+        @media (max-width: 768px) {
+            .bottom-bar {
+                padding: 8px 0;
+            }
+
+            .journal-container {
+                margin: 10px auto;
+                padding: 20px;
+            }
+
+
+            /* Ajuste de contenedor para móvil */
+            #journal-entry {
+                min-height: 300px;
+            }
+
+
+            /* Ajuste de área de texto para móvil */
+
+        }
+
+
+        /* CORRECCIÓN PARA CELULARES */
+        @media (max-width: 600px) {
+            .bottom-bar a {
+                font-size: 12px; /* Aumentar fuente ligeramente */
+            }
+
+            .bottom-bar img {
+                width: 28px; /* Mantener o aumentar el tamaño del icono */
+                height: 28px;
+            }
+
+
+            /* Asegurar que la barra tenga un padding adecuado en la parte inferior */
+            .bottom-bar {
+                padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+
+
+
+</head>
+<body>
+
+    <div class="container journal-container">
+        <h1>Diario personal ✍️</h1>
+        <p class="subtitle">Reflexiona y guarda tus pensamientos por fecha.</p>
+
+        <div id="lock-screen" class="lock-screen">
+            <div class="lock-content">
+                <h2 id="lock-title">🔒 Diario Bloqueado</h2>
+                <p id="lock-message">Ingresa tu clave privada para acceder a tus entradas.</p>
+                <input type="password" id="private-key" placeholder="Tu clave aquí..." />
+                <button id="unlock-btn" class="unlock-btn">Acceder / Crear Clave</button>
+                <p id="lock-status" class="status-message"></p>
+            </div>
+        </div>
+
+        <div id="journal-content" style="display: none;">
+
+            <div class="date-controls">
+                <button id="prev-day-btn" class="nav-btn" title="Día Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <input type="date" id="journal-date" class="form-control">
+                <button id="next-day-btn" class="nav-btn" title="Día Siguiente">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <div class="entry-area">
+                <textarea id="journal-entry" placeholder="¿Cómo te fue hoy?..." rows="15"></textarea>
+            </div>
+
+            <button id="save-entry-btn" class="save-btn" disabled>
+                Guardar Entrada
+            </button>
+            <p id="save-status" class="status-message"></p>
+
+            <button id="change-key-btn" class="change-key-btn">
+                Cambiar Clave Maestra
+            </button>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <a href="index.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg></a>
+        <a href="Calendario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></a>
+        <a href="Tareas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg></a>
+        <a href="Diario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg></a>
+        <a href="Finanzas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg></a>
+        <a href="Perfil.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg></a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('journal-date');
+            const entryTextarea = document.getElementById('journal-entry');
+            const saveButton = document.getElementById('save-entry-btn');
+            const prevDayBtn = document.getElementById('prev-day-btn');
+            const nextDayBtn = document.getElementById('next-day-btn');
+            const saveStatus = document.getElementById('save-status');
+            const changeKeyButton = document.getElementById('change-key-btn');
+
+            const lockScreen = document.getElementById('lock-screen');
+            const journalContent = document.getElementById('journal-content');
+            const privateKeyInput = document.getElementById('private-key');
+            const unlockButton = document.getElementById('unlock-btn');
+            const lockStatus = document.getElementById('lock-status');
+            const lockMessage = document.getElementById('lock-message');
+            const lockTitle = document.getElementById('lock-title');
+
+            let journalEntries = {};
+            let currentEntryContent = "";
+            let PRIVATE_KEY = null;
+            const MASTER_KEY_HASH_STORAGE = 'journalMasterKeyHash';
+            const ENCRYPTED_JOURNAL_STORAGE = 'journalEntries_Enc';
+
+            function hashKey(key) {
+                if (!window.CryptoJS) return null;
+                return CryptoJS.SHA256(key).toString(CryptoJS.enc.Hex);
+            }
+
+            function encryptEntry(entry, key = PRIVATE_KEY) {
+                if (!window.CryptoJS || !key) return entry;
+                return CryptoJS.AES.encrypt(entry, key).toString();
+            }
+
+            function decryptEntry(encryptedEntry, key = PRIVATE_KEY) {
+                if (!window.CryptoJS || !key) return encryptedEntry;
+                try {
+                    const bytes = CryptoJS.AES.decrypt(encryptedEntry, key);
+                    const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+                    if (!decrypted) return null;
+                    return decrypted;
+                } catch {
+                    return null;
+                }
+            }
+
+            function unlockJournal() {
+                lockStatus.textContent = '';
+                lockStatus.classList.remove('error');
+                const potentialKey = privateKeyInput.value.trim();
+                const storedMasterHash = localStorage.getItem(MASTER_KEY_HASH_STORAGE);
+
+                if (potentialKey.length < 4) {
+                    lockStatus.textContent = "La clave debe tener al menos 4 caracteres.";
+                    lockStatus.classList.add('error');
+                    return;
+                }
+
+                let keyIsCorrect = false;
+
+                if (storedMasterHash) {
+                    const hashedPotentialKey = hashKey(potentialKey);
+
+                    if (hashedPotentialKey === storedMasterHash) {
+                        keyIsCorrect = true;
+                    } else {
+                        lockStatus.textContent = "❌ Clave incorrecta. Inténtalo de nuevo.";
+                        lockStatus.classList.add('error');
+                        return;
+                    }
+
+                } else {
+                    // Configurar nueva clave
+                    if (confirm("Esta será tu CLAVE MAESTRA. ¡Si la olvidas, perderás tus entradas! ¿Deseas guardarla?")) {
+                        const hashedPotentialKey = hashKey(potentialKey);
+                        localStorage.setItem(MASTER_KEY_HASH_STORAGE, hashedPotentialKey);
+                        keyIsCorrect = true;
+                        // Actualizar el estado de la pantalla de bloqueo para la próxima vez
+                        lockTitle.textContent = "🔒 Diario Bloqueado";
+                        lockMessage.textContent = "Ingresa tu clave privada para acceder a tus entradas.";
+                        unlockButton.textContent = "Acceder";
+                    } else {
+                        lockStatus.textContent = "Clave no establecida.";
+                        lockStatus.classList.add('error');
+                        return;
+                    }
+                }
+
+                if (keyIsCorrect) {
+                    PRIVATE_KEY = potentialKey;
+                    const encryptedJournal = JSON.parse(localStorage.getItem(ENCRYPTED_JOURNAL_STORAGE)) || {};
+                    journalEntries = {};
+
+                    // Desencriptar datos
+                    for (const dateKey in encryptedJournal) {
+                        const decryptedContent = decryptEntry(encryptedJournal[dateKey], PRIVATE_KEY);
+                        if (decryptedContent) journalEntries[dateKey] = decryptedContent;
+                    }
+
+                    lockScreen.style.display = 'none';
+                    journalContent.style.display = 'block';
+                    privateKeyInput.value = ''; // Limpiar la clave por seguridad
+                    updateDate(new Date());
+                }
+            }
+
+            function saveJournalData() {
+                if (!PRIVATE_KEY) return;
+                const encryptedJournal = {};
+                for (const dateKey in journalEntries) {
+                    encryptedJournal[dateKey] = encryptEntry(journalEntries[dateKey]);
+                }
+                localStorage.setItem(ENCRYPTED_JOURNAL_STORAGE, JSON.stringify(encryptedJournal));
+            }
+
+            function formatDateToYYYYMMDD(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function parseYYYYMMDDToDate(dateString) {
+                const parts = dateString.split('-');
+                // Usamos UTC para evitar problemas de zona horaria con la fecha
+                return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+            }
+
+            function loadEntry(dateKey) {
+                const entry = journalEntries[dateKey] || "";
+                entryTextarea.value = entry;
+                currentEntryContent = entry;
+                saveButton.disabled = true;
+                saveStatus.textContent = entry.length > 0 ? "Entrada cargada. Edita para guardar." : "Entrada vacía. Escribe algo.";
+                saveStatus.classList.remove('success', 'error');
+            }
+
+            function saveEntry(dateKey) {
+                if (!PRIVATE_KEY) return;
+
+                const newContent = entryTextarea.value.trim();
+                const isDifferent = newContent !== currentEntryContent;
+
+                if (!isDifferent) return; // No hacer nada si no hay cambios.
+
+                if (newContent.length === 0) {
+                    if (journalEntries.hasOwnProperty(dateKey)) {
+                        delete journalEntries[dateKey];
+                        saveJournalData();
+                        currentEntryContent = "";
+                        saveStatus.textContent = "Entrada eliminada. 🗑️";
+                        saveStatus.classList.add('error');
+                        saveButton.disabled = true;
+                    }
+                    return;
+                }
+
+                // Guardar o actualizar
+                journalEntries[dateKey] = newContent;
+                saveJournalData();
+                currentEntryContent = newContent;
+                saveButton.disabled = true;
+                saveStatus.textContent = "¡Guardado con éxito! ✅";
+                saveStatus.classList.add('success');
+                setTimeout(() => { saveStatus.textContent = ""; saveStatus.classList.remove('success'); }, 3000);
+            }
+
+            function updateDate(date) {
+                dateInput.value = formatDateToYYYYMMDD(date);
+                loadEntry(dateInput.value);
+            }
+
+            function handleChangeMasterKey() {
+                const currentKey = prompt("Por favor, ingresa tu CLAVE MAESTRA ACTUAL para verificar:");
+                if (!currentKey) return;
+
+                const storedHash = localStorage.getItem(MASTER_KEY_HASH_STORAGE);
+                const currentKeyHash = hashKey(currentKey);
+
+                if (currentKeyHash !== storedHash) {
+                    alert("Clave actual incorrecta.");
+                    return;
+                }
+
+                const newKey = prompt("Ingresa tu NUEVA CLAVE MAESTRA (mínimo 4 caracteres):");
+                if (!newKey || newKey.length < 4) {
+                    alert("La nueva clave no es válida o es demasiado corta.");
+                    return;
+                }
+
+                if (!confirm(`¿Estás seguro de cambiar tu clave a: "${newKey}"? Perderla significa perder el acceso a todos tus datos.`)) return;
+
+                try {
+                    // 1. Re-encriptar todas las entradas con la nueva clave
+                    const oldEntries = { ...journalEntries }; // Copia de las entradas desencriptadas
+                    PRIVATE_KEY = newKey; // Usar la nueva clave
+
+                    // Borrar entradas en memoria para forzar la re-encriptación
+                    journalEntries = {};
+
+                    for (const dateKey in oldEntries) {
+                        // Cifrar con la nueva clave (PRIVATE_KEY ya es newKey)
+                        journalEntries[dateKey] = oldEntries[dateKey];
+                    }
+
+                    saveJournalData(); // Esto guarda las entradas re-encriptadas y el nuevo hash
+
+                    // 2. Guardar el nuevo hash
+                    const newKeyHash = hashKey(newKey);
+                    localStorage.setItem(MASTER_KEY_HASH_STORAGE, newKeyHash);
+
+                    alert("✅ Clave Maestra cambiada con éxito. ¡Asegúrate de recordarla!");
+                    loadEntry(dateInput.value);
+
+                } catch (e) {
+                    console.error("Error al cambiar la clave:", e);
+                    alert("❌ Hubo un error al re-encriptar las entradas. La clave no fue cambiada.");
+                    // Intentar revertir al estado anterior por seguridad.
+                    PRIVATE_KEY = currentKey;
+                }
+            }
+
+            // --- Event Listeners ---
+
+            // Autenticación
+            unlockButton.addEventListener('click', unlockJournal);
+            privateKeyInput.addEventListener('keypress', e => { if (e.key === 'Enter') unlockJournal(); });
+
+            // Navegación de Fecha
+            dateInput.addEventListener('change', () => {
+                if (!PRIVATE_KEY) return;
+                // Guardar la entrada actual si hay cambios antes de cambiar de fecha
+                saveEntry(dateInput.value);
+                loadEntry(dateInput.value);
+            });
+
+            entryTextarea.addEventListener('input', () => {
+                const isChanged = entryTextarea.value.trim() !== currentEntryContent;
+                saveButton.disabled = !isChanged;
+                saveStatus.textContent = isChanged ? "Tienes cambios sin guardar..." : "Entrada cargada.";
+                saveStatus.classList.remove('success', 'error');
+            });
+
+            saveButton.addEventListener('click', () => saveEntry(dateInput.value));
+
+            prevDayBtn.addEventListener('click', () => {
+                if (!PRIVATE_KEY) return;
+                saveEntry(dateInput.value);
+                const currentDate = parseYYYYMMDDToDate(dateInput.value);
+                currentDate.setUTCDate(currentDate.getUTCDate() - 1);
+                updateDate(currentDate);
+            });
+
+            nextDayBtn.addEventListener('click', () => {
+                if (!PRIVATE_KEY) return;
+                saveEntry(dateInput.value);
+                const currentDate = parseYYYYMMDDToDate(dateInput.value);
+                currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+                updateDate(currentDate);
+            });
+
+            // Cambio de clave
+            changeKeyButton.addEventListener('click', handleChangeMasterKey);
+
+
+            // --- Inicialización ---
+
+            // Verificar estado de la clave maestra al cargar
+            const storedHash = localStorage.getItem(MASTER_KEY_HASH_STORAGE);
+            if (!storedHash) {
+                lockTitle.textContent = "🆕 ¡Bienvenido! Crea tu Clave Maestra";
+                lockMessage.textContent = "Ingresa la clave que usarás para cifrar tu diario (mín. 4 caracteres).";
+                unlockButton.textContent = "Crear Clave y Acceder";
+            } else {
+                unlockButton.textContent = "Acceder";
+            }
+
+            // Establecer la fecha de hoy
+            dateInput.value = formatDateToYYYYMMDD(new Date());
+        });
+    </script>
+
+</body>
+</html>
