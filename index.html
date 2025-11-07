@@ -18,8 +18,6 @@
             navigator.serviceWorker.addEventListener("message", (event) => {
                 if (event.data && event.data.type === "NEW_VERSION") {
                     console.log("🆕 Nueva versión disponible");
-
-                    // Mostrar mensaje visual antes de recargar
                     const msg = document.createElement("div");
                     msg.textContent = "🔄 Actualizando Apptodo...";
                     msg.style.position = "fixed";
@@ -35,7 +33,6 @@
                     msg.style.zIndex = "9999";
                     document.body.appendChild(msg);
 
-                    // Espera un poco y recarga la app
                     setTimeout(() => window.location.reload(), 1500);
                 }
             });
@@ -55,11 +52,37 @@
         .container {
             max-width: 900px;
             margin: auto;
+            position: relative;
+            padding-top: 20px;
         }
 
+
+        /* --- ESTILO PARA EL BOTÓN DE CONFIGURACIÓN FIJO --- */
+        #settings-button-fixed {
+            position: absolute;
+            top: 20px; /* Distancia desde la parte superior */
+            right: 20px; /* Distancia desde la derecha */
+
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+
+            #settings-button-fixed:hover {
+                transform: scale(1.1);
+            }
+
+
+        /* Fin de estilos del botón fijo */
         .main-greeting {
             color: #2c3e50;
             margin-bottom: 10px;
+            margin-top: -10px; /* Ya no necesitamos margen superior porque el container lo compensa */
         }
 
 
@@ -85,57 +108,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
-
-
-
-        /* Habilitar clic en el título para abrir el modal */
-        .habits-widget .widget-title {
-            cursor: pointer;
-        }
-
-        .summary-amount {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        .summary-positive {
-            color: #27ae60;
-        }
-
-        .summary-negative {
-            color: #e74c3c;
-        }
-
-        .task-summary-list,
-        .event-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-            .task-summary-list li,
-            .event-list li {
-                display: flex;
-                justify-content: space-between;
-                padding: 8px 0;
-                border-bottom: 1px dotted #ecf0f1;
-                font-size: 0.95rem;
-            }
-
-                .task-summary-list li:first-child {
-                    font-weight: bold;
-                    color: #3498db;
-                    border-bottom: 2px solid #3498db;
-                    margin-bottom: 5px;
-                }
-
-        .task-summary-count, .event-date {
-            font-weight: bold;
-            color: #3498db;
-        }
-
-
 
 
         /* === ESTILOS PARA HABIT TRACKER === */
@@ -198,8 +170,115 @@
 
 
 
-        /* === ESTILOS PARA EL MODAL DE GESTIÓN DE HÁBITOS === */
-        #habits-management-modal {
+        /* FIN DE ESTILOS DE HÁBITOS */
+
+        /* --- ESTILOS PARA EL NUEVO WIDGET MENSTRUAL (COMPACTO) --- */
+        .menstrual-widget {
+            /* Mantiene el estilo de tarjeta blanca */
+            background-color: #ffffff;
+            color: #34495e;
+            padding: 15px; /* COMPACTO: Menos padding general */
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-top: 15px; /* COMPACTO: Menos margen superior */
+            border-left: 5px solid #e74c3c;
+        }
+
+            .menstrual-widget h3 {
+                font-size: 1.2rem; /* COMPACTO: Título más pequeño */
+                color: #e74c3c;
+                border-bottom: none;
+                padding-bottom: 0;
+                margin-bottom: 10px; /* COMPACTO: Menos margen inferior */
+                font-weight: 700;
+            }
+
+        .menstrual-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px; /* COMPACTO: Espacio reducido */
+            margin-bottom: 10px; /* COMPACTO: Espacio reducido */
+        }
+
+        .stat-card {
+            background-color: #ecf0f1;
+            padding: 10px; /* COMPACTO: Menos padding interno */
+            border-radius: 8px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+            .stat-card p {
+                margin: 0 0 3px 0;
+                font-size: 0.8rem; /* COMPACTO: Fuente más pequeña para la etiqueta */
+                color: #7f8c8d;
+            }
+
+            .stat-card strong {
+                font-size: 1.1rem; /* COMPACTO: Reducción del número principal */
+                font-weight: 900;
+                line-height: 1.1;
+                color: #e74c3c;
+            }
+
+        .phase-card {
+            /* Mantenemos el contraste, pero reducimos padding */
+            background: linear-gradient(90deg, #ff69b4 0%, #d81b60 100%);
+            color: white;
+            padding: 12px; /* COMPACTO: Padding reducido */
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(231, 76, 60, 0.3);
+        }
+
+            .phase-card h4 {
+                margin-top: 0;
+                font-size: 1.1rem; /* COMPACTO: Título de fase más pequeño */
+                font-weight: 700;
+                line-height: 1.2;
+            }
+
+            .phase-card p {
+                margin: 3px 0 0 0;
+                font-size: 0.9rem; /* COMPACTO: Descripción de fase más pequeña */
+                opacity: 0.9;
+            }
+
+        .register-period-btn {
+            /* Botón más pequeño */
+            width: 100%;
+            padding: 12px; /* COMPACTO: Padding reducido */
+            font-size: 1rem; /* COMPACTO: Fuente más pequeña */
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(90deg, #ff1493 0%, #d81b60 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(255, 0, 100, 0.4);
+            transition: transform 0.2s;
+        }
+
+            .register-period-btn:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(255, 0, 100, 0.5);
+            }
+
+
+        /* FIN ESTILOS MENSTRUALES AJUSTADOS */
+
+        /* Habilitar clic en el título para abrir el modal */
+        .habits-widget .widget-title {
+            cursor: pointer;
+        }
+
+        .summary-amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+
+        /* === ESTILOS PARA EL MODAL DE GESTIÓN DE HÁBITOS Y CONFIGURACIÓN === */
+        #habits-management-modal, #app-settings-modal, #initial-period-date-modal {
             display: none; /* Ocultar por defecto */
             position: fixed;
             z-index: 10000;
@@ -224,7 +303,7 @@
         }
 
         @keyframes slideIn {
-            from         {
+            from {
                 opacity: 0;
                 transform: translateY(-50px);
             }
@@ -254,7 +333,6 @@
             list-style: none;
             padding: 0;
         }
-
 
 
         /* Estilo para cada ítem de la lista en el modal */
@@ -292,8 +370,77 @@
             }
 
 
+        /* Estilos específicos para configuración */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
 
-        /* === FIN ESTILOS MODAL === */
+            .setting-item label {
+                font-weight: bold;
+                color: #34495e;
+            }
+
+            .setting-item input[type="number"] {
+                width: 60px;
+                padding: 5px;
+                text-align: center;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+
+        /* Estilo del Switch (Toggle) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+        input:checked + .slider {
+            background-color: #2ecc71;
+        }
+
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+
+
+        /* FIN ESTILOS MODAL */
 
         /* ===============================
             Bottom Bar (NO MODIFICAR)
@@ -368,6 +515,7 @@
         }
 
 
+
         /* CORRECCIÓN PARA CELULARES */
         @media (max-width: 600px) {
             .bottom-bar a {
@@ -385,10 +533,37 @@
                 padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
             }
         }
+
+        .events-widget .event-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+            .events-widget .event-list li {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 0;
+                border-bottom: 1px solid #eee;
+                font-size: 1rem;
+                color: #34495e;
+            }
+
+            .events-widget .event-list .event-date {
+                font-weight: bold;
+                color: #3498db; /*color de la fecha*/
+                font-size: 0.9rem;
+            }
     </style>
 </head>
 
 <body>
+
+    <button id="settings-button-fixed" onclick="openAppSettings()">
+        ⚙️
+    </button>
+
     <div class="container">
         <h1 class="main-greeting">Hola<span id="greeting-name"></span></h1>
         <p id="current-date" style="color: #444; margin-top: -10px;"></p>
@@ -404,6 +579,9 @@
             <p id="no-habits-message" style="color: #7f8c8d; text-align: center; padding: 5px; display: none;">
                 ¡Añade tu primer hábito con el botón '+'! 🌟
             </p>
+        </div>
+
+        <div id="menstrual-tracker-container">
         </div>
 
         <div class="tasks-summary-widget">
@@ -447,7 +625,66 @@
         </div>
     </div>
 
+    <div id="app-settings-modal">
+        <div class="modal-content">
+            <span class="modal-close-btn" onclick="closeAppSettings()">&times;</span>
+            <h2>⚙️ Configuración</h2>
+
+            <h3 style="border-bottom: 1px solid #eee; padding-bottom: 10px;">Seguimiento Menstrual</h3>
+
+            <div class="setting-item">
+                <label for="menstrual-toggle">Activar Módulo</label>
+                <label class="switch">
+                    <input type="checkbox" id="menstrual-toggle" onchange="toggleMenstrualTracker(this.checked)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="menstrual-settings-inputs" style="margin-top: 10px; padding: 10px; border: 1px dashed #e74c3c88; border-radius: 5px; display: none;">
+                <p style="font-size: 0.9em; margin-top: 0;">Estos datos se usan para estimar tu próximo ciclo.</p>
+
+                <div class="setting-item">
+                    <label for="cycle-length-input">Duración promedio del ciclo (días):</label>
+                    <input type="number" id="cycle-length-input" min="20" max="45" value="28">
+                </div>
+
+                <div class="setting-item" style="border-bottom: none;">
+                    <label for="period-length-input">Duración promedio del periodo (días):</label>
+                    <input type="number" id="period-length-input" min="2" max="10" value="5">
+                </div>
+
+                <button onclick="saveCycleSettingsFromModal()" style="width: 100%; padding: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                    Guardar Ajustes de Ciclo
+                </button>
+            </div>
+
+            <h3 style="border-bottom: 1px solid #eee; padding-top: 20px; padding-bottom: 10px;">Otras Opciones</h3>
+            <button onclick="localStorage.removeItem('userName'); window.location.reload();" style="background: none; border: none; color: #e74c3c; cursor: pointer; text-decoration: underline;">
+                Reiniciar Nombre de Usuario
+            </button>
+
+        </div>
+    </div>
+
+    <div id="initial-period-date-modal" class="modal-container">
+        <div class="modal-content" style="max-width: 350px;">
+            <span class="modal-close-btn" onclick="closeInitialDateModal()">&times;</span>
+            <h2 style="font-size: 1.5rem;">📅 Iniciar Seguimiento</h2>
+            <p style="color: #7f8c8d; margin-bottom: 15px;">Ingresa la fecha de **inicio** de tu último periodo:</p>
+
+            <input type="date" id="last-period-date-input" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 20px; font-size: 1.1rem;">
+
+            <button onclick="submitInitialPeriodDate()" class="register-period-btn" style="padding: 10px;">
+                Guardar Fecha
+            </button>
+        </div>
+    </div>
+
+
     <script>
+        // Declaración del estado global para el toggle
+        let isMenstrualCardVisible = false; // Ya no se usa para el toggle, pero se mantiene por seguridad
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- 1. Bienvenida ---
             let userName = localStorage.getItem('userName');
@@ -493,14 +730,10 @@
             let finalQuote = "";
 
             if (storedDate === todayDateKey && storedQuote) {
-                // Si la fecha guardada es HOY, usa la frase guardada
                 finalQuote = storedQuote;
             } else {
-                // Si la fecha es diferente (es un nuevo día) o no hay frase guardada, elige una nueva
                 const newQuote = quotes[Math.floor(Math.random() * quotes.length)];
                 finalQuote = newQuote;
-
-                // Guardar la nueva frase y la fecha de hoy
                 localStorage.setItem('dailyQuote', newQuote);
                 localStorage.setItem('dailyQuoteDate', todayDateKey);
             }
@@ -508,39 +741,30 @@
             quoteElement.textContent = `"${finalQuote}"`;
 
             // --- 4. HÁBITOS FUNCIONES ---
-            // Función auxiliar para detectar si un carácter es un emoji (usando el flag 'u' para caracteres Unicode)
             const isEmoji = (str) => /\p{Emoji}/u.test(str);
 
-            // Obtener la lista de hábitos que el usuario quiere trackear
             function getHabitsList() {
-                // *** CLAVE DE LISTA MAESTRA: 'userHabits' ***
                 const storedHabits = JSON.parse(localStorage.getItem('userHabits'));
-                return storedHabits || []; // Retorna un array vacío si no hay nada guardado
+                return storedHabits || [];
             }
 
-            // Guardar la lista maestra de hábitos
             function saveHabitsList(habits) {
                 localStorage.setItem('userHabits', JSON.stringify(habits));
             }
 
-            // Función para obtener la clave de almacenamiento del estado diario
             function getDailyHabitKey() {
-                const todayString = today.toISOString().slice(0, 10); // YYYY-MM-DD
+                const todayString = today.toISOString().slice(0, 10);
                 return `habits_state_${todayString}`;
             }
 
-            // Cargar el estado de los hábitos para hoy
             function loadDailyHabitState() {
-                // *** CLAVE DE ESTADO DIARIO: 'habits_state_YYYY-MM-DD' ***
                 return JSON.parse(localStorage.getItem(getDailyHabitKey())) || {};
             }
 
-            // Guardar el estado diario de los hábitos
             function saveDailyHabitState(state) {
                 localStorage.setItem(getDailyHabitKey(), JSON.stringify(state));
             }
 
-            // Añadir un nuevo hábito (ACTUALIZADA)
             function addHabit() {
                 const habitEmoji = prompt("1/2: Ingresa el EMOJI (ej: 🧘) para el nuevo hábito:");
                 if (!habitEmoji || habitEmoji.trim() === "") return;
@@ -553,13 +777,11 @@
                 const habitsList = getHabitsList();
                 const newId = Date.now().toString();
 
-                // Guarda el emoji y el nombre por separado
                 habitsList.push({ id: newId, emoji: finalEmoji, name: habitName.trim() });
                 saveHabitsList(habitsList);
-                renderHabits(); // Volver a dibujar la lista
+                renderHabits();
             }
 
-            // Función para eliminar un hábito
             function deleteHabit(habitId) {
                 const habitList = getHabitsList();
                 const habitToDelete = habitList.find(h => h.id === habitId);
@@ -568,31 +790,27 @@
                     return;
                 }
 
-                // 1. Eliminar de la lista maestra
                 let habitsList = habitList.filter(h => h.id !== habitId);
                 saveHabitsList(habitsList);
 
-                // 2. Limpiar el estado de completado para el día actual
                 const currentDailyState = loadDailyHabitState();
                 if (currentDailyState.hasOwnProperty(habitId)) {
                     delete currentDailyState[habitId];
                     saveDailyHabitState(currentDailyState);
                 }
 
-                // 3. Actualizar la interfaz
                 renderHabits();
-                renderManagementList(); // Actualiza la lista en el modal
+                renderManagementList();
             }
 
 
-            // Renderizar la lista de hábitos para el DASHBOARD (ACTUALIZADA)
             function renderHabits() {
                 const habitsListElement = document.getElementById('habits-list');
                 const noHabitsMessage = document.getElementById('no-habits-message');
                 const habitsList = getHabitsList();
                 const habitState = loadDailyHabitState();
 
-                habitsListElement.innerHTML = ''; // Limpiar lista
+                habitsListElement.innerHTML = '';
 
                 if (habitsList.length === 0) {
                     noHabitsMessage.style.display = 'block';
@@ -601,7 +819,6 @@
                     habitsList.forEach(habit => {
                         const isCompleted = habitState[habit.id] || false;
 
-                        // Usamos la propiedad 'emoji' separada
                         const emojiToShow = habit.emoji || '?';
                         const nameToShow = habit.name || 'Sin Nombre';
 
@@ -614,7 +831,6 @@
                         circleDiv.id = `habit-circle-${habit.id}`;
                         circleDiv.addEventListener('click', () => toggleHabit(habit.id));
 
-                        // Insertar el emoji o el check de completado
                         if (!isCompleted) {
                             circleDiv.textContent = emojiToShow;
                             circleDiv.style.fontSize = isEmoji(emojiToShow) ? '25px' : '1.5rem';
@@ -636,7 +852,6 @@
                 }
             }
 
-            // RENDERIZA LA LISTA DENTRO DEL MODAL (ACTUALIZADA)
             function renderManagementList() {
                 const managementList = document.getElementById('management-habits-list');
                 const habitsList = getHabitsList();
@@ -652,7 +867,6 @@
                     listItem.className = 'management-list-item';
 
                     const nameSpan = document.createElement('span');
-                    // Muestra el emoji y el nombre juntos en la lista de gestión
                     nameSpan.textContent = (habit.emoji || '?') + ' ' + (habit.name || 'Sin Nombre');
 
                     const deleteBtn = document.createElement('button');
@@ -666,20 +880,16 @@
                 });
             }
 
-            // NUEVA FUNCIÓN: Abrir Modal
             function openHabitsManagement() {
                 renderManagementList();
                 document.getElementById('habits-management-modal').style.display = 'block';
             }
 
-            // NUEVA FUNCIÓN: Cerrar Modal
             function closeHabitsManagement() {
                 document.getElementById('habits-management-modal').style.display = 'none';
-                renderHabits(); // Asegura que el dashboard se actualice
+                renderHabits();
             }
 
-
-            // Cambiar el estado de un hábito y actualizar la interfaz (ACTUALIZADA)
             function toggleHabit(habitId) {
                 const habitState = loadDailyHabitState();
                 const habitList = getHabitsList();
@@ -687,25 +897,20 @@
 
                 if (!habitData) return;
 
-                // Toggle del estado
                 habitState[habitId] = !habitState[habitId];
 
                 saveDailyHabitState(habitState);
 
-                // Actualizar visualmente SÓLO el círculo afectado
                 const circle = document.getElementById(`habit-circle-${habitId}`);
 
                 if (circle) {
                     if (habitState[habitId]) {
-                        // Estado: Completado (Mostrar Check)
                         circle.classList.add('completed');
-                        circle.textContent = '✔'; // Check
+                        circle.textContent = '✔';
                         circle.style.fontSize = '20px';
                         circle.style.color = 'white';
                     } else {
-                        // Estado: Pendiente (Mostrar Emoji guardado)
                         circle.classList.remove('completed');
-
                         const emojiToShow = habitData.emoji || '?';
                         circle.textContent = emojiToShow;
                         circle.style.fontSize = isEmoji(emojiToShow) ? '25px' : '1.5rem';
@@ -714,13 +919,281 @@
                 }
             }
 
-            // Adjuntar eventos
-            document.getElementById('add-habit-btn').addEventListener('click', addHabit);
-            document.getElementById('open-habits-management').addEventListener('click', openHabitsManagement);
-            document.getElementById('close-modal-btn').addEventListener('click', closeHabitsManagement);
+            // --- 5. CALENDARIO MENSTRUAL FUNCIONES (MODIFICADAS) ---
+
+            const PREF_MENSTRUAL_KEY = 'isMenstrualTrackerActive';
+            const LAST_PERIOD_KEY = 'menstrual_lastPeriodDate';
+            const CYCLE_LENGTH_KEY = 'menstrual_cycleLength';
+            const PERIOD_LENGTH_KEY = 'menstrual_periodLength';
+
+            function isMenstrualTrackerActive() {
+                return localStorage.getItem(PREF_MENSTRUAL_KEY) === 'true';
+            }
+
+            function toggleMenstrualTracker(isActive) {
+                localStorage.setItem(PREF_MENSTRUAL_KEY, isActive ? 'true' : 'false');
+
+                const inputsDiv = document.getElementById('menstrual-settings-inputs');
+                if (inputsDiv) {
+                    inputsDiv.style.display = isActive ? 'block' : 'none';
+                }
+
+                if (!isActive) {
+                    localStorage.removeItem(LAST_PERIOD_KEY);
+                    // Ya no ocultamos aquí, el renderizado principal lo gestiona.
+                }
+                renderMenstrualTrackerCard();
+            }
+
+            function saveCycleSettings(cycleLength, periodLength) {
+                localStorage.setItem(CYCLE_LENGTH_KEY, cycleLength);
+                localStorage.setItem(PERIOD_LENGTH_KEY, periodLength);
+            }
+
+            function getCycleSettings() {
+                return {
+                    cycleLength: parseInt(localStorage.getItem(CYCLE_LENGTH_KEY) || '28'),
+                    periodLength: parseInt(localStorage.getItem(PERIOD_LENGTH_KEY) || '5')
+                };
+            }
+
+            function saveCycleSettingsFromModal() {
+                const cycleLength = document.getElementById('cycle-length-input').value;
+                const periodLength = document.getElementById('period-length-input').value;
+                saveCycleSettings(cycleLength, periodLength);
+                alert("Ajustes de ciclo guardados.");
+                renderMenstrualTrackerCard();
+            }
+
+            /**
+             * Muestra el modal del calendario para ingresar la fecha inicial.
+             */
+            function promptForLastPeriod() {
+                // Solo se ejecuta si está activo y no hay fecha guardada
+                if (!isMenstrualTrackerActive() || localStorage.getItem(LAST_PERIOD_KEY)) return;
+
+                // Abre el modal del calendario
+                document.getElementById('initial-period-date-modal').style.display = 'block';
+            }
+
+            /**
+             * Maneja la acción de guardar la fecha desde el input de calendario.
+             */
+            function submitInitialPeriodDate() {
+                const input = document.getElementById('last-period-date-input');
+                const dateValue = input.value;
+
+                if (!dateValue) {
+                    alert("Por favor, selecciona una fecha válida.");
+                    return;
+                }
+
+                // Guardar la fecha del input de tipo date
+                localStorage.setItem(LAST_PERIOD_KEY, dateValue);
+
+                closeInitialDateModal();
+                alert(`¡Registro inicial exitoso!`);
+                renderMenstrualTrackerCard();
+            }
+
+            /**
+             * Cierra el modal de fecha inicial.
+             */
+            function closeInitialDateModal() {
+                document.getElementById('initial-period-date-modal').style.display = 'none';
+            }
 
 
-            // --- 5. Tareas (Sin cambios) ---
+            /**
+             * Registra la fecha de hoy como inicio del último periodo automáticamente (usado en el botón).
+             */
+            function registerPeriodToday() {
+                if (!isMenstrualTrackerActive()) return;
+
+                const today = new Date();
+                const todayString = today.toISOString().slice(0, 10);
+
+                localStorage.setItem(LAST_PERIOD_KEY, todayString);
+                alert(`¡Periodo registrado! Nuevo ciclo iniciado`);
+                renderMenstrualTrackerCard();
+            }
+
+
+            function calculateCycleDates() {
+                const lastPeriodDate = localStorage.getItem(LAST_PERIOD_KEY);
+
+                if (!lastPeriodDate || !isMenstrualTrackerActive()) return null;
+
+                const { cycleLength, periodLength } = getCycleSettings();
+                const lastStart = new Date(lastPeriodDate);
+
+                if (isNaN(lastStart.getTime())) return null;
+
+                const nextStart = new Date(lastStart);
+                nextStart.setDate(lastStart.getDate() + cycleLength);
+
+                const periodEnd = new Date(lastStart);
+                periodEnd.setDate(lastStart.getDate() + periodLength - 1);
+
+                const ovulationDate = new Date(nextStart);
+                ovulationDate.setDate(nextStart.getDate() - 14);
+
+                return {
+                    lastStart: lastStart,
+                    periodEnd: periodEnd,
+                    nextStart: nextStart,
+                    ovulation: ovulationDate,
+                    cycleLength: cycleLength,
+                    periodLength: periodLength
+                };
+            }
+
+            function formatDate(dateObject) {
+                if (!(dateObject instanceof Date) || isNaN(dateObject.getTime())) return 'N/A';
+                const day = dateObject.getDate().toString().padStart(2, '0');
+                const month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+                return `${day}/${month}/${dateObject.getFullYear()}`;
+            }
+
+            // FUNCIÓN DE RENDERIZADO PRINCIPAL (MOSTRAR SIEMPRE si está activo)
+            function renderMenstrualTrackerCard() {
+                const container = document.getElementById('menstrual-tracker-container');
+                if (!container) return;
+                container.innerHTML = '';
+
+                if (!isMenstrualTrackerActive()) {
+                    return;
+                }
+
+                const lastPeriodDate = localStorage.getItem(LAST_PERIOD_KEY);
+                const registerButtonHtml = `
+                                                        <button onclick="registerPeriodToday()" class="register-period-btn">
+                                                            🩸 Registrar inicio de período hoy
+                                                        </button>`;
+
+                // 1. Estado: Módulo Activo, Faltan Datos (Inicialización)
+                if (!lastPeriodDate) {
+                    // Llama al modal para la entrada inicial
+                    promptForLastPeriod();
+
+                    // Renderiza el estado de espera y la opción de ingresar manualmente/automático.
+                    container.innerHTML = `
+                                                            <div class="menstrual-widget" style="text-align: center;">
+                                                                <h3>Registro del Ciclo Menstrual 🩸</h3>
+                                                                <p style="color: #7f8c8d; margin-bottom: 10px;">Ingresa la fecha de tu último periodo para empezar.</p>
+                                                                ${registerButtonHtml}
+                                                                <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
+                                                                    O <span onclick="promptForLastPeriod()" style="text-decoration:underline; cursor:pointer; color:#e74c3c;">ingresa una fecha anterior.</span>
+                                                                </p>
+                                                            </div>
+                                                        `;
+                    return;
+                }
+
+                // Si llegamos aquí, los datos deben existir.
+                const cycleData = calculateCycleDates();
+
+                if (!cycleData) {
+                    // Failsafe
+                    container.innerHTML = `<div class="menstrual-widget"><h3>Error</h3><p>No se pudo calcular el ciclo. Revisa la fecha o configuración.</p></div>`;
+                    return;
+                }
+
+                const today = new Date(todayDateKey);
+                const timeToNext = Math.ceil((cycleData.nextStart - today) / (1000 * 60 * 60 * 24));
+                const daysInCycle = Math.ceil((today - cycleData.lastStart) / (1000 * 60 * 60 * 24)) + 1;
+
+                // --- LÓGICA DE FASES ---
+                let phaseTitle = "Fase Lútea";
+                let phaseDescription = "Se prepara el cuerpo para la menstruación. Podrías sentir cambios de humor y antojos.";
+                let phaseDays = `(Días 15-${cycleData.cycleLength})`;
+
+                const dayOfCycle = daysInCycle;
+                const FOLLICULAR_END = 13;
+                const OVULATION_WINDOW = 14;
+
+                if (dayOfCycle <= cycleData.periodLength) {
+                    phaseTitle = "Menstruación";
+                    phaseDescription = "Fase de sangrado. Tómate el tiempo para descansar y cuidarte.";
+                    phaseDays = `(Días 1-${cycleData.periodLength})`;
+                } else if (dayOfCycle <= FOLLICULAR_END) {
+                    phaseTitle = "Fase Folicular";
+                    phaseDescription = "Aumenta el estrógeno; más energía, concentración y ánimo.";
+                    phaseDays = `(Días ${cycleData.periodLength + 1}-${FOLLICULAR_END})`;
+                } else if (dayOfCycle >= (OVULATION_WINDOW - 2) && dayOfCycle <= (OVULATION_WINDOW + 2)) {
+                    phaseTitle = "Ventana de Ovulación";
+                    phaseDescription = "Pico de fertilidad y máxima energía social.";
+                    phaseDays = `(Días 12-16)`;
+                }
+
+                // --- RENDERIZADO ---
+                container.innerHTML = `
+                                                            <div class="menstrual-widget">
+                                                                <h3>Registro del Ciclo Menstrual 🩸</h3>
+
+                                                                <div class="menstrual-stats-grid">
+                                                                    <div class="stat-card">
+                                                                        <p>Día del Ciclo</p>
+                                                                        <strong>${dayOfCycle}</strong>
+                                                                    </div>
+                                                                    <div class="stat-card">
+                                                                        <p>Próximo Periodo</p>
+                                                                        <strong>${formatDate(cycleData.nextStart).slice(0, 5)}</strong> </div>
+                                                                </div>
+
+                                                                <div class="phase-card">
+                                                                    <h4>${phaseTitle} ${phaseDays}</h4>
+                                                                    <p>${phaseDescription}</p>
+                                                                </div>
+
+                                                                ${registerButtonHtml}
+
+                                                                <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
+                                                                    Próxima Ovulación estimada: ${formatDate(cycleData.ovulation).slice(0, 5)}
+                                                                    <br>
+                                                                    <span onclick="openAppSettings()" style="color: #e74c3c; cursor: pointer; text-decoration: underline;">Ajustar duración de ciclo</span>
+                                                                </p>
+
+                                                            </div>
+                                                        `;
+            }
+
+            // --- 6. MODAL DE CONFIGURACIÓN DE LA APP (NUEVO) ---
+
+            function loadAppSettings() {
+                const is_active = isMenstrualTrackerActive();
+                document.getElementById('menstrual-toggle').checked = is_active;
+
+                const settings = getCycleSettings();
+                document.getElementById('cycle-length-input').value = settings.cycleLength;
+                document.getElementById('period-length-input').value = settings.periodLength;
+
+                const inputsDiv = document.getElementById('menstrual-settings-inputs');
+                if (inputsDiv) {
+                    inputsDiv.style.display = is_active ? 'block' : 'none';
+                }
+            }
+
+            window.openAppSettings = function () {
+                loadAppSettings();
+                document.getElementById('app-settings-modal').style.display = 'block';
+            }
+
+            window.closeAppSettings = function () {
+                document.getElementById('app-settings-modal').style.display = 'none';
+                renderMenstrualTrackerCard();
+            }
+
+            // Exposición de funciones al ámbito global
+            window.toggleMenstrualTracker = toggleMenstrualTracker;
+            window.saveCycleSettingsFromModal = saveCycleSettingsFromModal;
+            window.registerPeriodToday = registerPeriodToday;
+            window.submitInitialPeriodDate = submitInitialPeriodDate;
+            window.closeInitialDateModal = closeInitialDateModal;
+            window.promptForLastPeriod = promptForLastPeriod;
+
+
+            // --- 7. Tareas (Sin cambios) ---
             function loadUpcomingTasks() {
                 const tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || [];
                 const pendingListElement = document.getElementById('upcoming-tasks-list');
@@ -744,7 +1217,7 @@
                 } else { noTasksMessage.style.display = 'block'; }
             }
 
-            // --- 6. Eventos (Sin cambios) ---
+            // --- 8. Eventos (Sin cambios) ---
             function loadUpcomingEvents() {
                 const eventsData = JSON.parse(localStorage.getItem('calendarEvents')) || {};
                 const eventListElement = document.getElementById('upcoming-events-list');
@@ -780,9 +1253,17 @@
                 } else { noEventsMessage.style.display = 'block'; }
             }
 
-            renderHabits(); // Cargar y mostrar los hábitos al inicio
+            // --- 9. INICIALIZACIÓN FINAL ---
+
+            // CONEXIÓN DE EVENTOS (Corregida)
+            document.getElementById('add-habit-btn').addEventListener('click', addHabit);
+            document.getElementById('open-habits-management').addEventListener('click', openHabitsManagement);
+            document.getElementById('close-modal-btn').addEventListener('click', closeHabitsManagement);
+
+            renderHabits();
             loadUpcomingEvents();
             loadUpcomingTasks();
+            renderMenstrualTrackerCard(); // Renderiza la tarjeta menstrual si está activa.
         });
     </script>
 </body>

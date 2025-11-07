@@ -33,11 +33,11 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-NlJk6+Hz8\/dZgrVD0640jp0nMt+gxIk83dDSmyi5dyo=",
+      "hash": "sha256-DjG7XBoC\/UtxUcenA1n0T9c3YvgK2jBegtCF6c20uo0=",
       "url": "_framework\/blazor.boot.json"
     },
     {
-      "hash": "sha256-andEmmb69\/QoYmSncpwIdHTC\/yeOnVHoffLNVEG+HtA=",
+      "hash": "sha256-vhLVBUNKmbXvTbaJ+aqF9b0UpDUMvZlZ97pITQ+g4LI=",
       "url": "_framework\/AppTodoo.wasm"
     },
     {
@@ -201,7 +201,7 @@
       "url": "icon-512.png"
     },
     {
-      "hash": "sha256-VyHzQre6fBtNJ0Hwcu7TOzJq2OAHvqGSPvbWmQ92lLQ=",
+      "hash": "sha256-N831O1rTnwTKyAPoEHzsdM6J\/L2wLSYga8SaoEqF\/tQ=",
       "url": "index.html"
     },
     {
@@ -221,5 +221,5 @@
       "url": "Tareas.html"
     }
   ],
-  "version": "VJS8WszF"
+  "version": "2zcTi0\/b"
 };
