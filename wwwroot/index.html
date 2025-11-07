@@ -168,8 +168,6 @@
         }
 
 
-
-
         /* FIN DE ESTILOS DE HÁBITOS */
 
         /* --- ESTILOS PARA EL NUEVO WIDGET MENSTRUAL (COMPACTO) --- */
@@ -443,7 +441,7 @@
         /* FIN ESTILOS MODAL */
 
         /* ===============================
-            Bottom Bar (NO MODIFICAR)
+            Bottom Bar (MEJORADO PARA ACTIVO)
         ============================== */
         .bottom-bar {
             position: fixed;
@@ -469,44 +467,37 @@
                 align-items: center;
                 font-size: 12px;
                 transition: 0.3s;
+                padding: 5px 10px; /* Añadido para el borde activo */
+                border-radius: 8px; /* Añadido para el borde activo */
+                border: 2px solid transparent; /* BASE */
             }
 
-                .bottom-bar a span.material-symbols-outlined {
-                    font-size: 28px; /* tamaño del icono */
+                .bottom-bar a svg {
+                    font-size: 28px;
                     margin-bottom: 4px;
                     transition: transform 0.2s, color 0.2s;
-                    color: #555; /* Color del icono por defecto (Gris Oscuro) */
+                    fill: #555; /* Color del SVG por defecto */
                 }
 
-            .bottom-bar img {
-                width: 28px; /* ajusta el tamaño según tu diseño */
-                height: 28px;
-                filter: brightness(0) invert(0); /* vuelve el ícono oscuro */
-                transition: 0.3s;
-            }
+                /* Resaltado para el enlace activo */
+                .bottom-bar a.active {
+                    /* Color de fondo/borde para la pestaña activa */
+                    border: 2px solid #3498db;
+                    background-color: #ebf5fb;
+                    color: #3498db;
+                }
 
-            .bottom-bar a.active img,
-            .bottom-bar a:hover img {
-                filter: brightness(0) saturate(100%) sepia(80%) hue-rotate(180deg) brightness(1); /* tono azul al hacer hover o estar activo */
-            }
+                    .bottom-bar a.active svg {
+                        transform: translateY(-3px) scale(1.05); /* Ligeramente más grande y levantado */
+                        fill: #3498db; /* Color del SVG activo */
+                    }
 
-            .bottom-bar a.active span.material-symbols-outlined {
-                transform: translateY(-3px) scale(1.1);
-                color: #3498db;
-            }
+                /* Resaltado al pasar el ratón (Hover) */
+                .bottom-bar a:hover svg {
+                    transform: translateY(-2px);
+                    fill: #3498db;
+                }
 
-            .bottom-bar a.active span {
-                color: #3498db;
-            }
-
-            .bottom-bar a:hover span.material-symbols-outlined {
-                transform: translateY(-2px);
-                color: #3498db;
-            }
-
-            .bottom-bar a:hover span {
-                color: #3498db;
-            }
 
         @media (max-width: 768px) {
             .bottom-bar {
@@ -515,15 +506,15 @@
         }
 
 
-
         /* CORRECCIÓN PARA CELULARES */
         @media (max-width: 600px) {
             .bottom-bar a {
-                font-size: 12px; /* Aumentar fuente ligeramente */
+                font-size: 10px; /* Reducir fuente un poco para móviles */
+                padding: 5px; /* Ajustar padding */
             }
 
-            .bottom-bar img {
-                width: 28px; /* Mantener o aumentar el tamaño del icono */
+            .bottom-bar svg {
+                width: 28px;
                 height: 28px;
             }
 
@@ -555,6 +546,35 @@
                 color: #3498db; /*color de la fecha*/
                 font-size: 0.9rem;
             }
+
+        /* === ESTILOS DE LA LISTA DE TAREAS (SOLO TAREAS, SIN VIÑETAS) === */
+
+        .tasks-summary-widget .task-summary-list {
+            list-style: none; /* Elimina viñetas por defecto */
+            padding: 0; /* Elimina padding izquierdo del UL */
+            margin-top: 5px;
+        }
+
+            .tasks-summary-widget .task-summary-list li {
+                /* Alineación y separación para cada tarea */
+                color: #34495e;
+                font-size: 1rem;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+                display: flex;
+                align-items: center;
+                position: relative;
+            }
+
+                /* Eliminamos el elemento ::before (el punto azul) */
+                .tasks-summary-widget .task-summary-list li:before {
+                    content: none; /* Elimina el punto/viñeta */
+                }
+
+                /* Asegurar que la última tarea no tenga línea divisoria */
+                .tasks-summary-widget .task-summary-list li:last-child {
+                    border-bottom: none;
+                }
     </style>
 </head>
 
@@ -604,12 +624,24 @@
     </div>
 
     <div class="bottom-bar">
-        <a href="index.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg></a>
-        <a href="Calendario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg></a>
-        <a href="Tareas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg></a>
-        <a href="Diario.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg></a>
-        <a href="Finanzas.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg></a>
-        <a href="Perfil.html"><svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg></a>
+        <a href="index.html" class="active">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" /></svg>
+        </a>
+        <a href="Calendario.html">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" /></svg>
+        </a>
+        <a href="Tareas.html">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h168q13-36 43.5-58t68.5-22q38 0 68.5 22t43.5 58h168q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm80-80h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm200-190q13 0 21.5-8.5T510-820q0-13-8.5-21.5T480-850q-13 0-21.5 8.5T450-820q0 13 8.5 21.5T480-790ZM200-200v-560 560Z" /></svg>
+        </a>
+        <a href="Diario.html">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" /></svg>
+        </a>
+        <a href="Finanzas.html">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z" /></svg>
+        </a>
+        <a href="Perfil.html">
+            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" /></svg>
+        </a>
     </div>
 
     <div id="habits-management-modal">
@@ -1067,9 +1099,9 @@
 
                 const lastPeriodDate = localStorage.getItem(LAST_PERIOD_KEY);
                 const registerButtonHtml = `
-                                                        <button onclick="registerPeriodToday()" class="register-period-btn">
-                                                            🩸 Registrar inicio de período hoy
-                                                        </button>`;
+                                                <button onclick="registerPeriodToday()" class="register-period-btn">
+                                                    🩸 Registrar inicio de período hoy
+                                                </button>`;
 
                 // 1. Estado: Módulo Activo, Faltan Datos (Inicialización)
                 if (!lastPeriodDate) {
@@ -1078,15 +1110,15 @@
 
                     // Renderiza el estado de espera y la opción de ingresar manualmente/automático.
                     container.innerHTML = `
-                                                            <div class="menstrual-widget" style="text-align: center;">
-                                                                <h3>Registro del Ciclo Menstrual 🩸</h3>
-                                                                <p style="color: #7f8c8d; margin-bottom: 10px;">Ingresa la fecha de tu último periodo para empezar.</p>
-                                                                ${registerButtonHtml}
-                                                                <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
-                                                                    O <span onclick="promptForLastPeriod()" style="text-decoration:underline; cursor:pointer; color:#e74c3c;">ingresa una fecha anterior.</span>
-                                                                </p>
-                                                            </div>
-                                                        `;
+                                                <div class="menstrual-widget" style="text-align: center;">
+                                                    <h3>Registro del Ciclo Menstrual 🩸</h3>
+                                                    <p style="color: #7f8c8d; margin-bottom: 10px;">Ingresa la fecha de tu último periodo para empezar.</p>
+                                                    ${registerButtonHtml}
+                                                    <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
+                                                        O <span onclick="promptForLastPeriod()" style="text-decoration:underline; cursor:pointer; color:#e74c3c;">ingresa una fecha anterior.</span>
+                                                    </p>
+                                                </div>
+                                                `;
                     return;
                 }
 
@@ -1128,34 +1160,34 @@
 
                 // --- RENDERIZADO ---
                 container.innerHTML = `
-                                                            <div class="menstrual-widget">
-                                                                <h3>Registro del Ciclo Menstrual 🩸</h3>
+                                                <div class="menstrual-widget">
+                                                    <h3>Registro del Ciclo Menstrual 🩸</h3>
 
-                                                                <div class="menstrual-stats-grid">
-                                                                    <div class="stat-card">
-                                                                        <p>Día del Ciclo</p>
-                                                                        <strong>${dayOfCycle}</strong>
-                                                                    </div>
-                                                                    <div class="stat-card">
-                                                                        <p>Próximo Periodo</p>
-                                                                        <strong>${formatDate(cycleData.nextStart).slice(0, 5)}</strong> </div>
-                                                                </div>
+                                                    <div class="menstrual-stats-grid">
+                                                        <div class="stat-card">
+                                                            <p>Día del Ciclo</p>
+                                                            <strong>${dayOfCycle}</strong>
+                                                        </div>
+                                                        <div class="stat-card">
+                                                            <p>Próximo Periodo</p>
+                                                            <strong>${formatDate(cycleData.nextStart).slice(0, 5)}</strong> </div>
+                                                    </div>
 
-                                                                <div class="phase-card">
-                                                                    <h4>${phaseTitle} ${phaseDays}</h4>
-                                                                    <p>${phaseDescription}</p>
-                                                                </div>
+                                                    <div class="phase-card">
+                                                        <h4>${phaseTitle} ${phaseDays}</h4>
+                                                        <p>${phaseDescription}</p>
+                                                    </div>
 
-                                                                ${registerButtonHtml}
+                                                    ${registerButtonHtml}
 
-                                                                <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
-                                                                    Próxima Ovulación estimada: ${formatDate(cycleData.ovulation).slice(0, 5)}
-                                                                    <br>
-                                                                    <span onclick="openAppSettings()" style="color: #e74c3c; cursor: pointer; text-decoration: underline;">Ajustar duración de ciclo</span>
-                                                                </p>
+                                                    <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #7f8c8d;">
+                                                        Próxima Ovulación estimada: ${formatDate(cycleData.ovulation).slice(0, 5)}
+                                                        <br>
+                                                        <span onclick="openAppSettings()" style="color: #e74c3c; cursor: pointer; text-decoration: underline;">Ajustar duración de ciclo</span>
+                                                    </p>
 
-                                                            </div>
-                                                        `;
+                                                </div>
+                                                `;
             }
 
             // --- 6. MODAL DE CONFIGURACIÓN DE LA APP (NUEVO) ---
@@ -1193,28 +1225,31 @@
             window.promptForLastPeriod = promptForLastPeriod;
 
 
-            // --- 7. Tareas (Sin cambios) ---
+            // --- 7. Tareas (MODIFICADA: Sin 'Total Pendiente') ---
             function loadUpcomingTasks() {
                 const tasks = JSON.parse(localStorage.getItem('minimalToggleTodoTasks')) || [];
                 const pendingListElement = document.getElementById('upcoming-tasks-list');
                 const noTasksMessage = document.getElementById('no-tasks-message');
 
-                const pendingTasks = tasks.filter(t => !t.completed).slice(0, 5);
+                // MODIFICACIÓN: Ya NO se usa .slice(0, 5) para limitar el número de tareas.
+                const pendingTasks = tasks.filter(t => !t.completed);
                 pendingListElement.innerHTML = '';
 
                 if (pendingTasks.length > 0) {
                     noTasksMessage.style.display = 'none';
-                    const totalPending = tasks.filter(t => !t.completed).length;
-                    const summaryLi = document.createElement('li');
-                    summaryLi.innerHTML = `<span>Total Pendiente:</span><span class="task-summary-count">${totalPending}</span>`;
-                    pendingListElement.appendChild(summaryLi);
 
+                    // **ELIMINADO:** const summaryLi = document.createElement('li');
+                    // **ELIMINADO:** pendingListElement.appendChild(summaryLi);
+
+                    // Solo agregamos las tareas individuales
                     pendingTasks.forEach(task => {
                         const li = document.createElement('li');
                         li.innerHTML = `<span>${task.text}</span>`;
                         pendingListElement.appendChild(li);
                     });
-                } else { noTasksMessage.style.display = 'block'; }
+                } else {
+                    noTasksMessage.style.display = 'block';
+                }
             }
 
             // --- 8. Eventos (Sin cambios) ---
