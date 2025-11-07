@@ -33,11 +33,11 @@
       "url": "_framework\/icudt_no_CJK.dat"
     },
     {
-      "hash": "sha256-DjG7XBoC\/UtxUcenA1n0T9c3YvgK2jBegtCF6c20uo0=",
+      "hash": "sha256-XhXFNAryacMKnq+2aZq34i50s6ZPuOO3lm+53NY0yCI=",
       "url": "_framework\/blazor.boot.json"
     },
     {
-      "hash": "sha256-vhLVBUNKmbXvTbaJ+aqF9b0UpDUMvZlZ97pITQ+g4LI=",
+      "hash": "sha256-sjj8YJg2401RLWeOeKEecQ8kMbWwWPvG8DnuvG1NKL4=",
       "url": "_framework\/AppTodoo.wasm"
     },
     {
@@ -169,7 +169,7 @@
       "url": "AppTodoo.styles.css"
     },
     {
-      "hash": "sha256-CXCvHKOQv55yenMpt3c6xFOaxve9zl0Tzt0EEc1dCJk=",
+      "hash": "sha256-NWcHBkHb7c3Yq8pcvRy\/ahac\/MPgzHA1UD\/a5b5i4d8=",
       "url": "Calendario.html"
     },
     {
@@ -185,11 +185,11 @@
       "url": "css\/bootstrap\/bootstrap.min.css.map"
     },
     {
-      "hash": "sha256-3GcxqP9aeGLvAWr7g1nKKiLo46RlV302c0gLAPOeRYg=",
+      "hash": "sha256-whiYJz+lXG3IXSQhw4lA\/wnH+RxO6C5E5miT306qezw=",
       "url": "Diario.html"
     },
     {
-      "hash": "sha256-qwbqgjCOzb561b3WNjXXmEln0Dog0eeIv\/bO6Y7e5eo=",
+      "hash": "sha256-BDRzDv1s0E1XKDSqFP9bgaVG4odnkYXq1TGchOiuOwg=",
       "url": "Finanzas.html"
     },
     {
@@ -201,7 +201,7 @@
       "url": "icon-512.png"
     },
     {
-      "hash": "sha256-N831O1rTnwTKyAPoEHzsdM6J\/L2wLSYga8SaoEqF\/tQ=",
+      "hash": "sha256-YqT9njOnJ0OrfQhWbKV6a\/166kAvy74IMhztjWEDloM=",
       "url": "index.html"
     },
     {
@@ -209,7 +209,7 @@
       "url": "manifest.webmanifest"
     },
     {
-      "hash": "sha256-5MeIsAoAWYPyqWmjx3VKzL3cca2kFmIx1qSliyLmlHY=",
+      "hash": "sha256-SsmdenTItWQqxHOjEQlrcDmVO4BY7NLr177UA5LQaiA=",
       "url": "Perfil.html"
     },
     {
@@ -217,9 +217,9 @@
       "url": "sample-data\/weather.json"
     },
     {
-      "hash": "sha256-EPmlRaCUlBgBWIeS6on4jJfayagAB6bH981qZVewWNE=",
+      "hash": "sha256-PPC1X+ab5FVAJyw3laLb5cvf85S7fUHoMpsuTkq415Q=",
       "url": "Tareas.html"
     }
   ],
-  "version": "2zcTi0\/b"
+  "version": "hdbvKxAs"
 };
