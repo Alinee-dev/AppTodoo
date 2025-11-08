@@ -1,13 +1,16 @@
 // sw.js
 
-// 1. CLAVE DE CACHÉ: ¡IMPORTANTE! Cambia este nombre (v1.3, v1.4, etc.) 
-// cada vez que subas cambios al código de la app para forzar la actualización en los usuarios.
-const CACHE_NAME = 'apptodoo-cache-v1.2';
+// 1. CLAVE DE CACHÉ: ¡IMPORTANTE! Cambia este nombre (v1.4, v1.5, etc.)
+const CACHE_NAME = 'apptodoo-cache-v1.4'; // <<< CAMBIO: Se incrementa la versión
+
+// 2. DEFINICIÓN DEL PREFIJO: Ajusta esto a la ruta de tu repositorio.
+// Usa '/' si está en la raíz del dominio (ej: misitio.com/)
+// Usa '/nombre-del-repo/' si está en un subdirectorio (ej: usuario.github.io/MiApp/)
+const REPO_PREFIX = '/'; // <<< CAMBIO: Se define la variable REPO_PREFIX
 
 // 3. ARCHIVOS PARA CACLEAR (Pre-cacheo): Lista de archivos esenciales
-// Las rutas usan el prefijo del repositorio para funcionar correctamente en GitHub Pages.
 const urlsToCache = [
-    REPO_PREFIX, // La ruta base (ej: /TodoApp/)
+    REPO_PREFIX, // La ruta base (ej: /TodoApp/ o /)
     REPO_PREFIX + 'index.html',
     REPO_PREFIX + 'Calendario.html',
     REPO_PREFIX + 'Tareas.html',
@@ -16,7 +19,7 @@ const urlsToCache = [
     REPO_PREFIX + 'Perfil.html',
     REPO_PREFIX + 'manifest.json',
     // Asegúrate de añadir tus archivos CSS y de iconos:
-    REPO_PREFIX + 'style.css', 
+    REPO_PREFIX + 'style.css',
     REPO_PREFIX + 'icons/icon-192.png',
     REPO_PREFIX + 'icons/icon-512.png',
 ];
@@ -38,7 +41,7 @@ self.addEventListener('install', event => {
                 console.error('[SW] Error al cachear archivos estáticos:', err);
             })
     );
-});S
+});
 
 // --- EVENTO ACTIVATE: Limpiar cachés viejas para la actualización ---
 self.addEventListener('activate', event => {
@@ -65,13 +68,12 @@ self.addEventListener('activate', event => {
 });
 
 
-// --- EVENTO FETCH: Estrategia de manejo de peticiones (Cache-First) ---
+// --- EVENTO FETCH: Estrategia de manejo de peticiones (Cache-First, con Fallback) ---
 self.addEventListener('fetch', event => {
     // Intercepta peticiones solo si son GET (no POST, etc.)
     if (event.request.method !== 'GET') return;
 
     // 1. Intenta obtener la respuesta de la caché.
-    // 2. Si no la encuentra, va a la red.
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -80,11 +82,20 @@ self.addEventListener('fetch', event => {
                     return response;
                 }
 
-                // Si no está en caché, va a la red.
+                // 2. Si no está en caché, va a la red.
                 return fetch(event.request).catch(error => {
                     console.error('[SW] Fallo de red para:', event.request.url);
-                    // Opcional: Podrías devolver aquí una página de error offline
-                    // si la app está completamente sin conexión.
+
+                    // <<< CAMBIO CRÍTICO: MANEJO DEL FALLO OFFLINE >>>
+                    // Si el fetch falla (porque estamos offline),
+                    // intenta devolver el 'index.html' cacheado para que la PWA cargue.
+                    if (event.request.mode === 'navigate') {
+                        return caches.match(REPO_PREFIX + 'index.html');
+                    }
+
+                    // Si es un recurso (CSS, imagen, JS) que no estaba en caché y falló en la red,
+                    // podemos devolver un error vacío para evitar un fallo total del Service Worker.
+                    return new Response(null, { status: 404 });
                 });
             })
     );
