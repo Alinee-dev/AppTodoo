@@ -2,8 +2,7 @@
 
 // 1. CLAVE DE CACHÉ: ¡IMPORTANTE! Cambia este nombre (v1.3, v1.4, etc.) 
 // cada vez que subas cambios al código de la app para forzar la actualización en los usuarios.
-const CACHE_NAME = 'apptodo-cache-v1.0';
-
+const CACHE_NAME = 'apptodoo-cache-v1.1';
 
 // 3. ARCHIVOS PARA CACLEAR (Pre-cacheo): Lista de archivos esenciales
 // Las rutas usan el prefijo del repositorio para funcionar correctamente en GitHub Pages.
@@ -17,9 +16,9 @@ const urlsToCache = [
     REPO_PREFIX + 'Perfil.html',
     REPO_PREFIX + 'manifest.json',
     // Asegúrate de añadir tus archivos CSS y de iconos:
-    // REPO_PREFIX + 'style.css', 
-    // REPO_PREFIX + 'icons/icon-192.png',
-    // REPO_PREFIX + 'icons/icon-512.png',
+    REPO_PREFIX + 'style.css',
+    REPO_PREFIX + 'icons/icon-192.png',
+    REPO_PREFIX + 'icons/icon-512.png',
 ];
 
 // -------------------------------------------------------------------
@@ -39,7 +38,7 @@ self.addEventListener('install', event => {
                 console.error('[SW] Error al cachear archivos estáticos:', err);
             })
     );
-});S
+}); S
 
 // --- EVENTO ACTIVATE: Limpiar cachés viejas para la actualización ---
 self.addEventListener('activate', event => {
