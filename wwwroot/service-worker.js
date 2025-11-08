@@ -16,9 +16,9 @@ const urlsToCache = [
     REPO_PREFIX + 'Perfil.html',
     REPO_PREFIX + 'manifest.json',
     // Asegúrate de añadir tus archivos CSS y de iconos:
-    // REPO_PREFIX + 'style.css', 
-    // REPO_PREFIX + 'icons/icon-192.png',
-    // REPO_PREFIX + 'icons/icon-512.png',
+    REPO_PREFIX + 'style.css', 
+    REPO_PREFIX + 'icons/icon-192.png',
+    REPO_PREFIX + 'icons/icon-512.png',
 ];
 
 // -------------------------------------------------------------------
