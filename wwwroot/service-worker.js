@@ -2,7 +2,7 @@
 
 // 1. CLAVE DE CACHÉ: ¡IMPORTANTE! Cambia este nombre (v1.3, v1.4, etc.) 
 // cada vez que subas cambios al código de la app para forzar la actualización en los usuarios.
-const CACHE_NAME = 'apptodoo-cache-v1.1';
+const CACHE_NAME = 'apptodoo-cache-v1.2';
 
 // 3. ARCHIVOS PARA CACLEAR (Pre-cacheo): Lista de archivos esenciales
 // Las rutas usan el prefijo del repositorio para funcionar correctamente en GitHub Pages.
